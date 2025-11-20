@@ -2,12 +2,16 @@ import type { UserType } from "./auth.type";
 
 export type ChatType = {
   _id: string;
-  lastMessage: MessageType;
+  name?: string;
+  lastMessage?: MessageType;
   participants: UserType[];
   isGroup: boolean;
   isAiChat: boolean;
+  type?: "DIRECT" | "GROUP" | "CHANNEL";
   createdBy: string;
   groupName?: string;
+  admins?: string[] | UserType[];
+  unreadCount?: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -19,6 +23,7 @@ export type MessageType = {
   sender: UserType | null;
   replyTo: MessageType | null;
   chatId: string;
+  messageType?: "USER" | "SYSTEM";
   createdAt: string;
   updatedAt: string;
   //only frontend

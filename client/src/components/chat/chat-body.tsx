@@ -34,14 +34,35 @@ const ChatBody = ({ chatId, messages, onReply }: Props) => {
   }, [messages]);
 
   return (
-    <div className="w-full max-w-6xl mx-auto flex flex-col px-3 py-2">
-      {messages.map((message) => (
-        <ChatBodyMessage
-          key={message._id}
-          message={message}
-          onReply={onReply}
-        />
-      ))}
+    <div className="w-full flex flex-col px-4 py-2">
+      {messages.map((message) => {
+        // Render system messages
+        if (message.messageType === "SYSTEM") {
+          return (
+            <div
+              key={message._id}
+              className="flex justify-center my-2"
+            >
+              <div className="bg-muted px-3 py-1 rounded-full text-xs text-muted-foreground">
+                {message.content}
+              </div>
+            </div>
+          );
+        }
+
+        // Filter out messages without valid sender for regular messages
+        if (!message.sender || !message.sender._id) {
+          return null;
+        }
+
+        return (
+          <ChatBodyMessage
+            key={message._id}
+            message={message}
+            onReply={onReply}
+          />
+        );
+      })}
       <div ref={bottomRef} />
     </div>
   );

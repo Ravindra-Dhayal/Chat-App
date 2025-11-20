@@ -34,7 +34,6 @@ export const useSocket = create<SocketState>()((set, get) => ({
     });
 
     newSocket.on("online:users", (userIds) => {
-      console.log("Online users", userIds);
       set({ onlineUsers: userIds });
     });
   },

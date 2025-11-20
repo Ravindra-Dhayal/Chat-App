@@ -1,11 +1,7 @@
-import EmptyState from "@/components/empty-state";
+import ChatList from "@/components/chat/chat-list";
 
 const Chat = () => {
-  return (
-    <div className="hidden lg:block h-svh">
-      <EmptyState />
-    </div>
-  );
+  return <ChatList />;
 };
 
 export default Chat;

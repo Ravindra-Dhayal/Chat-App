@@ -7,18 +7,19 @@ import RouteGuard from "./route-guard";
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Auth / Public routes */}
-      <Route path="/" element={<RouteGuard requireAuth={false} />}>
-        <Route element={<BaseLayout />}>
-          {authRoutesPaths?.map((route) => (
+      {/* Protected routes with AppLayout - Must come first to match before auth routes */}
+      <Route element={<RouteGuard requireAuth={true} />}>
+        <Route element={<AppLayout />}>
+          {protectedRoutesPaths?.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
       </Route>
 
-      <Route path="/" element={<RouteGuard requireAuth={true} />}>
-        <Route element={<AppLayout />}>
-          {protectedRoutesPaths?.map((route) => (
+      {/* Auth / Public routes */}
+      <Route element={<RouteGuard requireAuth={false} />}>
+        <Route element={<BaseLayout />}>
+          {authRoutesPaths?.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>

@@ -80,16 +80,16 @@ const ChatFooter = ({
     <>
       <div
         className="sticky bottom-0
-       inset-x-0 z-[999]
-       bg-card border-t border-border py-4
+       inset-x-0 z-40
+       bg-card border-t border-border py-3 mb-16
       "
       >
         {image && !isSendingMsg && (
-          <div className="max-w-6xl mx-auto px-8.5">
+          <div className="px-4 mb-2">
             <div className="relative w-fit">
               <img
                 src={image}
-                className="object-contain h-16 bg-muted min-w-16"
+                className="object-contain h-16 bg-muted min-w-16 rounded-lg"
               />
 
               <Button
@@ -110,9 +110,7 @@ const ChatFooter = ({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="max-w-6xl px-8.5 mx-auto
-            flex items-end gap-2
-            "
+            className="px-4 flex items-end gap-2"
           >
             <div className="flex items-center gap-1.5">
               <Button

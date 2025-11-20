@@ -1,9 +1,7 @@
 import { getOtherUserAndGroup } from "@/lib/helper";
-import { cn } from "@/lib/utils";
 import type { ChatType } from "@/types/chat.type";
-import { useLocation } from "react-router-dom";
 import AvatarWithBadge from "../avatar-with-badge";
-import { formatChatTime } from "../../lib/helper";
+import { useTheme } from "../theme-provider";
 
 interface PropsType {
   chat: ChatType;
@@ -11,8 +9,7 @@ interface PropsType {
   onClick?: () => void;
 }
 const ChatListItem = ({ chat, currentUserId, onClick }: PropsType) => {
-  const { pathname } = useLocation();
-  const { lastMessage, createdAt } = chat;
+  const { lastMessage } = chat;
 
   const { name, avatar, isOnline, isGroup } = getOtherUserAndGroup(
     chat,
@@ -40,41 +37,33 @@ const ChatListItem = ({ chat, currentUserId, onClick }: PropsType) => {
     return lastMessage.content;
   };
 
+  const unreadCount = chat.unreadCount || 0;
+  const { theme } = useTheme();
+
   return (
     <button
       onClick={onClick}
-      className={cn(
-        `w-full flex items-center gap-2 p-2 rounded-sm
-         hover:bg-sidebar-accent transition-colors text-left`,
-        pathname.includes(chat._id) && "!bg-sidebar-accent"
-      )}
+      className={`w-full text-left flex items-center gap-3 p-3 rounded-lg transition-colors
+        ${theme === "dark" ? "hover:bg-slate-800" : "hover:bg-gray-100"}`}
     >
       <AvatarWithBadge
         name={name}
         src={avatar}
         isGroup={isGroup}
         isOnline={isOnline}
+        size="w-10 h-10"
       />
-
       <div className="flex-1 min-w-0">
-        <div
-          className="
-         flex items-center justify-between mb-0.5
-        "
-        >
-          <h5 className="text-sm font-semibold truncate">{name}</h5>
-          <span
-            className="text-xs
-           ml-2 shrink-0 text-muted-foreground
-          "
-          >
-            {formatChatTime(lastMessage?.updatedAt || createdAt)}
-          </span>
-        </div>
-        <p className="text-xs truncate text-muted-foreground -mt-px">
+        <h3 className="font-medium truncate">{name}</h3>
+        <p className={`text-sm truncate ${theme === "dark" ? "text-slate-400" : "text-gray-500"}`}>
           {getLastMessageText()}
         </p>
       </div>
+      {unreadCount > 0 && (
+        <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
+          {unreadCount}
+        </span>
+      )}
     </button>
   );
 };

@@ -2,6 +2,13 @@ import SignIn from "@/pages/auth/sign-in";
 import SignUp from "@/pages/auth/sign-up";
 import Chat from "@/pages/chat";
 import SingleChat from "@/pages/chat/chatId";
+import Home from "@/pages/home";
+import Channel from "@/pages/channel";
+import SingleChannel from "@/pages/channel/channelId";
+import Community from "@/pages/community";
+import SingleCommunity from "@/pages/community/communityId";
+import Groups from "@/pages/groups";
+import SingleGroup from "@/pages/groups/groupId";
 
 export const AUTH_ROUTES = {
   SIGN_IN: "/",
@@ -9,8 +16,15 @@ export const AUTH_ROUTES = {
 };
 
 export const PROTECTED_ROUTES = {
+  HOME: "/home",
   CHAT: "/chat",
   SINGLE_CHAT: "/chat/:chatId",
+  CHANNEL: "/channel",
+  SINGLE_CHANNEL: "/channel/:channelId",
+  COMMUNITY: "/community",
+  SINGLE_COMMUNITY: "/community/:communityId",
+  GROUPS: "/groups",
+  SINGLE_GROUP: "/groups/:groupId",
 };
 
 export const authRoutesPaths = [
@@ -26,12 +40,40 @@ export const authRoutesPaths = [
 
 export const protectedRoutesPaths = [
   {
+    path: PROTECTED_ROUTES.HOME,
+    element: <Home />,
+  },
+  {
     path: PROTECTED_ROUTES.CHAT,
     element: <Chat />,
   },
   {
     path: PROTECTED_ROUTES.SINGLE_CHAT,
     element: <SingleChat />,
+  },
+  {
+    path: PROTECTED_ROUTES.CHANNEL,
+    element: <Channel />,
+  },
+  {
+    path: PROTECTED_ROUTES.SINGLE_CHANNEL,
+    element: <SingleChannel />,
+  },
+  {
+    path: PROTECTED_ROUTES.COMMUNITY,
+    element: <Community />,
+  },
+  {
+    path: PROTECTED_ROUTES.SINGLE_COMMUNITY,
+    element: <SingleCommunity />,
+  },
+  {
+    path: PROTECTED_ROUTES.GROUPS,
+    element: <Groups />,
+  },
+  {
+    path: PROTECTED_ROUTES.SINGLE_GROUP,
+    element: <SingleGroup />,
   },
 ];
 

@@ -41,3 +41,10 @@ export class UnauthorizedException extends AppError {
     super(message, HTTPSTATUS.UNAUTHORIZED, ErrorCodes.ERR_UNAUTHORIZED);
   }
 }
+
+export class ForbiddenException extends AppError {
+  constructor(message = "Forbidden Access") {
+    super(message, HTTPSTATUS.FORBIDDEN, ErrorCodes.ERR_FORBIDDEN);
+  }
+}
+

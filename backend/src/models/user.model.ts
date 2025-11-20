@@ -1,11 +1,21 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { compareValue, hashValue } from "../utils/bcrypt";
 
+export enum UserRole {
+  USER = "USER",
+  MODERATOR = "MODERATOR",
+  ADMIN = "ADMIN",
+}
+
 export interface UserDocument extends Document {
   name: string;
   email?: string;
   password?: string;
   avatar?: string | null;
+  role: UserRole;
+  isSuspended: boolean;
+  suspendedUntil?: Date;
+  suspensionReason?: string;
   createdAt: Date;
   updatedAt: Date;
 
@@ -27,6 +37,23 @@ const userSchema = new Schema<UserDocument>(
       required: true,
     },
     avatar: { type: String, default: null },
+    role: {
+      type: String,
+      enum: Object.values(UserRole),
+      default: UserRole.USER,
+    },
+    isSuspended: {
+      type: Boolean,
+      default: false,
+    },
+    suspendedUntil: {
+      type: Date,
+      default: null,
+    },
+    suspensionReason: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,

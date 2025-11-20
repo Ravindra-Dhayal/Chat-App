@@ -1,13 +1,28 @@
 import mongoose from "mongoose";
 import cloudinary from "../config/cloudinary.config";
-import ChatModel from "../models/chat.model";
+import ChatModel, { ChatType } from "../models/chat.model";
 import MessageModel from "../models/message.model";
-import { BadRequestException, NotFoundException } from "../utils/app-error";
+import { BadRequestException, ForbiddenException, NotFoundException } from "../utils/app-error";
 import {
   emitLastMessageToParticipants,
   emitNewMessageToChatRoom,
 } from "../lib/socket";
 import UserModel from "../models/user.model";
+
+const ALLOWED_FILE_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/plain",
+  "application/zip",
+  "application/x-rar-compressed",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+];
+
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export const sendMessageService = async (
   userId: string,
@@ -15,10 +30,16 @@ export const sendMessageService = async (
     chatId: string;
     content?: string;
     image?: string;
+    file?: {
+      data: string; // base64
+      name: string;
+      type: string;
+      size: number;
+    };
     replyToId?: string;
   }
 ) => {
-  const { chatId, content, image, replyToId } = body;
+  const { chatId, content, image, file, replyToId } = body;
 
   const chat = await ChatModel.findOne({
     _id: chatId,
@@ -27,6 +48,18 @@ export const sendMessageService = async (
     },
   });
   if (!chat) throw new BadRequestException("Chat not found or unauthorized");
+
+  // Check if user is admin for CHANNEL type chats
+  if (chat.type === ChatType.CHANNEL) {
+    const isAdmin = chat.admins.some((admin) => 
+      admin.toString() === userId.toString()
+    );
+    if (!isAdmin) {
+      throw new ForbiddenException(
+        "Only channel admins can post messages in this channel"
+      );
+    }
+  }
 
   if (replyToId) {
     const replyMessage = await MessageModel.findOne({
@@ -37,11 +70,53 @@ export const sendMessageService = async (
   }
 
   let imageUrl;
+  let fileMetadata;
 
   if (image) {
-    //upload the image to cloudinary
-    const uploadRes = await cloudinary.uploader.upload(image);
+    // Validate image size
+    const imageSizeInBytes = Buffer.byteLength(image, "base64");
+    if (imageSizeInBytes > MAX_IMAGE_SIZE) {
+      throw new BadRequestException(
+        "Image size exceeds 10MB limit"
+      );
+    }
+
+    // Upload image to cloudinary
+    const uploadRes = await cloudinary.uploader.upload(image, {
+      resource_type: "auto",
+      folder: "chat-app/images",
+    });
     imageUrl = uploadRes.secure_url;
+  }
+
+  if (file) {
+    // Validate file type
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      throw new BadRequestException(
+        `File type '${file.type}' is not allowed. Allowed types: PDF, DOC, DOCX, XLS, XLSX, TXT, ZIP, RAR, PPT`
+      );
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      throw new BadRequestException(
+        "File size exceeds 50MB limit"
+      );
+    }
+
+    // Upload file to cloudinary
+    const uploadRes = await cloudinary.uploader.upload(file.data, {
+      resource_type: "raw",
+      folder: "chat-app/files",
+      public_id: file.name.split(".")[0],
+    });
+
+    fileMetadata = {
+      url: uploadRes.secure_url,
+      name: file.name,
+      type: file.type,
+      size: file.size,
+    };
   }
 
   const newMessage = await MessageModel.create({
@@ -49,6 +124,7 @@ export const sendMessageService = async (
     sender: userId,
     content,
     image: imageUrl,
+    file: fileMetadata || null,
     replyTo: replyToId || null,
   });
 
@@ -56,7 +132,7 @@ export const sendMessageService = async (
     { path: "sender", select: "name avatar" },
     {
       path: "replyTo",
-      select: "content image sender",
+      select: "content image file sender",
       populate: {
         path: "sender",
         select: "name avatar",
@@ -65,14 +141,22 @@ export const sendMessageService = async (
   ]);
 
   chat.lastMessage = newMessage._id as mongoose.Types.ObjectId;
+
+  // Mark all non-sender participants as unread
+  chat.unreadBy = chat.participants.filter(
+    (id) => id.toString() !== userId
+  ) as mongoose.Types.ObjectId[];
+
   await chat.save();
 
   //websocket emit the new Message to the chat room
   emitNewMessageToChatRoom(userId, chatId, newMessage);
 
-  //websocket emit the lastmessage to members (personnal room user)
-  const allParticipantIds = chat.participants.map((id) => id.toString());
-  emitLastMessageToParticipants(allParticipantIds, chatId, newMessage);
+  //websocket emit the lastmessage to members (personnal room user) - exclude sender
+  const otherParticipantIds = chat.participants
+    .filter((id) => id.toString() !== userId)
+    .map((id) => id.toString());
+  emitLastMessageToParticipants(otherParticipantIds, chatId, newMessage);
 
   return {
     userMessage: newMessage,

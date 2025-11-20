@@ -81,6 +81,27 @@ export const initializeSocket = (httpServer: HTTPServer) => {
       }
     });
 
+    // Channel subscription events
+    socket.on(
+      "channel:subscribe",
+      async (channelId: string, callback?: (err?: string) => void) => {
+        try {
+          socket.join(`channel:${channelId}`);
+          console.log(`User ${userId} subscribed to channel:${channelId}`);
+          callback?.();
+        } catch (error) {
+          callback?.("Error subscribing to channel");
+        }
+      }
+    );
+
+    socket.on("channel:unsubscribe", (channelId: string) => {
+      if (channelId) {
+        socket.leave(`channel:${channelId}`);
+        console.log(`User ${userId} unsubscribed from channel:${channelId}`);
+      }
+    });
+
     socket.on("disconnect", () => {
       if (onlineUsers.get(userId) === newSocketId) {
         if (userId) onlineUsers.delete(userId);
@@ -128,6 +149,9 @@ export const emitNewMessageToChatRoom = (
   } else {
     io.to(`chat:${chatId}`).emit("message:new", message);
   }
+
+  // Also emit to all participants' personal rooms so their list updates
+  // This will be handled by emitLastMessageToParticipants
 };
 
 export const emitLastMessageToParticipants = (
@@ -140,5 +164,25 @@ export const emitLastMessageToParticipants = (
 
   for (const participantId of participantIds) {
     io.to(`user:${participantId}`).emit("chat:update", payload);
+    // Also emit message:new event so the list can update unread count
+    io.to(`user:${participantId}`).emit("message:new", { chatId });
   }
+};
+
+export const emitChannelSubscriberUpdate = (
+  channelId: string,
+  event: "subscriber:joined" | "subscriber:left",
+  userId: string
+) => {
+  const io = getIO();
+  io.to(`channel:${channelId}`).emit(event, { userId, channelId });
+};
+
+export const emitChannelAdminUpdate = (
+  channelId: string,
+  event: "admin:added" | "admin:removed",
+  userId: string
+) => {
+  const io = getIO();
+  io.to(`channel:${channelId}`).emit(event, { userId, channelId });
 };

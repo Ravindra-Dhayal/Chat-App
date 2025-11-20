@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useChat } from "@/hooks/use-chat";
-import { Spinner } from "../ui/spinner";
 import ChatListItem from "./chat-list-item";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import ChatListHeader from "./chat-list-header";
 import { useSocket } from "@/hooks/use-socket";
 import type { ChatType } from "@/types/chat.type";
-import type { MessageType } from "../../types/chat.type";
+import type { MessageType } from "@/types/chat.type";
+import { useTheme } from "@/components/theme-provider";
 
 const ChatList = () => {
   const navigate = useNavigate();
@@ -20,20 +20,22 @@ const ChatList = () => {
     updateChatLastMessage,
   } = useChat();
   const { user } = useAuth();
+  const { theme } = useTheme();
   const currentUserId = user?._id || null;
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredChats =
-    chats?.filter(
-      (chat) =>
-        chat.groupName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        chat.participants?.some(
-          (p) =>
-            p._id !== currentUserId &&
-            p.name?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-    ) || [];
+  // Filter only direct chats (exclude groups and channels)
+  const directChats = chats?.filter((chat) => !chat.isGroup && chat.type !== "CHANNEL") || [];
+
+  const filteredChats = directChats.filter(
+    (chat) =>
+      chat.participants?.some(
+        (p) =>
+          p._id !== currentUserId &&
+          p.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+  );
 
   useEffect(() => {
     fetchChats();
@@ -77,48 +79,30 @@ const ChatList = () => {
   };
 
   return (
-    <div
-      className="fixed inset-y-0
-      pb-20 lg:pb-0
-      lg:max-w-[379px]
-      lg:block
-      border-r
-      border-border
-      bg-sidebar
-      max-w-[calc(100%)]
-      w-full
-      z-[98]
-    "
-    >
-      <div className="flex-col">
+    <div className={`h-screen overflow-y-auto pb-20 ${theme === "dark" ? "bg-slate-900" : "bg-white"}`}>
+      <div className="p-4">
         <ChatListHeader onSearch={setSearchQuery} />
 
-        <div
-          className="
-         flex-1 h-[calc(100vh-100px)]
-         overflow-y-auto        "
-        >
-          <div className="px-2 pb-10 pt-1 space-y-1">
-            {isChatsLoading ? (
-              <div className="flex items-center justify-center">
-                <Spinner className="w-7 h-7" />
-              </div>
-            ) : filteredChats?.length === 0 ? (
-              <div className="flex items-center justify-center">
-                {searchQuery ? "No chat found" : "No chats created"}
-              </div>
-            ) : (
-              filteredChats?.map((chat) => (
-                <ChatListItem
-                  key={chat._id}
-                  chat={chat}
-                  currentUserId={currentUserId}
-                  onClick={() => onRoute(chat._id)}
-                />
-              ))
-            )}
+        {isChatsLoading ? (
+          <div className="flex items-center justify-center h-40">
+            <p className="text-muted-foreground">Loading chats...</p>
           </div>
-        </div>
+        ) : filteredChats?.length === 0 ? (
+          <div className="flex items-center justify-center py-10 text-muted-foreground text-sm">
+            {searchQuery ? "No chat found" : "No chats created"}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filteredChats?.map((chat) => (
+              <ChatListItem
+                key={chat._id}
+                chat={chat}
+                currentUserId={currentUserId}
+                onClick={() => onRoute(chat._id)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

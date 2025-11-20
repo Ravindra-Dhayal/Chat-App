@@ -37,6 +37,22 @@ export const getOtherUserAndGroup = (
   };
 };
 
+export const getChatRecipient = (
+  chat: ChatType,
+  currentUserId: string | null
+) => {
+  const other = chat?.participants?.find((p) => p._id !== currentUserId);
+  const isOnline = isUserOnline(other?._id ?? "");
+
+  return {
+    name: other?.name || "Unknown",
+    subheading: isOnline ? "Online" : "Offline",
+    avatar: other?.avatar || "",
+    isOnline,
+    isAI: other?.isAI || false,
+  };
+};
+
 export const formatChatTime = (date: string | Date) => {
   if (!date) return "";
   const newDate = new Date(date);

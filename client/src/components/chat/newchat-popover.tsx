@@ -2,7 +2,7 @@ import { memo, useEffect, useState } from "react";
 import { useChat } from "@/hooks/use-chat";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
-import { ArrowLeft, PenBoxIcon, Search, UsersIcon } from "lucide-react";
+import { ArrowLeft, Plus, Search, UsersIcon } from "lucide-react";
 import {
   InputGroup,
   InputGroupAddon,
@@ -83,14 +83,13 @@ export const NewChatPopover = memo(() => {
   return (
     <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <Button
+        <button
           onClick={() => setIsOpen(true)}
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
+          className="bg-primary text-primary-foreground p-2 rounded-lg hover:opacity-90 transition-opacity"
+          title="Create Chat"
         >
-          <PenBoxIcon className="!h-5 !w-5 !stroke-1" />
-        </Button>
+          <Plus className="h-5 w-5" />
+        </button>
       </PopoverTrigger>
       <PopoverContent
         align="start"
@@ -138,10 +137,6 @@ export const NewChatPopover = memo(() => {
             </div>
           ) : !isGroupMode ? (
             <>
-              <NewGroupItem
-                disabled={isCreatingChat}
-                onClick={() => setIsGroupMode(true)}
-              />
               {users?.map((user) => (
                 <ChatUserItem
                   key={user._id}

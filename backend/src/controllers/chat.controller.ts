@@ -6,6 +6,11 @@ import {
   createChatService,
   getSingleChatService,
   getUserChatsService,
+  markChatAsReadService,
+  addMemberToChatService,
+  removeMemberFromChatService,
+  promoteToGroupAdminService,
+  deleteChatService,
 } from "../services/chat.service";
 
 export const createChatController = asyncHandler(
@@ -45,6 +50,78 @@ export const getSingleChatController = asyncHandler(
       message: "User chats retrieved successfully",
       chat,
       messages,
+    });
+  }
+);
+
+export const markChatAsReadController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { id } = chatIdSchema.parse(req.params);
+
+    const chat = await markChatAsReadService(id, userId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Chat marked as read",
+      chat,
+    });
+  }
+);
+
+export const addMemberToChatController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { id } = chatIdSchema.parse(req.params);
+    const { userId: memberId } = req.body;
+
+    const chat = await addMemberToChatService(id, memberId, userId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Member added to chat",
+      chat,
+    });
+  }
+);
+
+export const removeMemberFromChatController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { id } = chatIdSchema.parse(req.params);
+    const { userId: memberId } = req.body;
+
+    const chat = await removeMemberFromChatService(id, memberId, userId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Member removed from chat",
+      chat,
+    });
+  }
+);
+
+export const promoteToGroupAdminController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { id } = chatIdSchema.parse(req.params);
+    const { userId: memberId } = req.body;
+
+    const chat = await promoteToGroupAdminService(id, memberId, userId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Member promoted to admin",
+      chat,
+    });
+  }
+);
+
+export const deleteChatController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { id } = chatIdSchema.parse(req.params);
+
+    const result = await deleteChatService(id, userId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: result.message,
     });
   }
 );

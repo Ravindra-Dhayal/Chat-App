@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import type { MessageType } from "@/types/chat.type";
@@ -6,6 +6,7 @@ import AvatarWithBadge from "../avatar-with-badge";
 import { formatChatTime } from "@/lib/helper";
 import { Button } from "../ui/button";
 import { ReplyIcon } from "lucide-react";
+import ImageViewerDialog from "./image-viewer-dialog";
 
 interface Props {
   message: MessageType;
@@ -13,6 +14,7 @@ interface Props {
 }
 const ChatMessageBody = memo(({ message, onReply }: Props) => {
   const { user } = useAuth();
+  const [showImageViewer, setShowImageViewer] = useState(false);
 
   const userId = user?._id || null;
   const isCurrentUser = message.sender?._id === userId;
@@ -34,7 +36,7 @@ const ChatMessageBody = memo(({ message, onReply }: Props) => {
   );
 
   const messageClass = cn(
-    "min-w-[200px] px-3 py-2 text-sm break-words shadow-sm",
+    "px-3 py-2 text-sm break-words shadow-sm",
     isCurrentUser
       ? "bg-accent dark:bg-primary/40 rounded-tr-xl rounded-l-xl"
       : "bg-[#F5F5F5] dark:bg-accent rounded-bl-xl rounded-r-xl"
@@ -93,7 +95,8 @@ const ChatMessageBody = memo(({ message, onReply }: Props) => {
               <img
                 src={message?.image || ""}
                 alt=""
-                className="rounded-lg max-w-xs"
+                className="rounded-lg max-w-xs cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => setShowImageViewer(true)}
               />
             )}
 
@@ -128,6 +131,14 @@ const ChatMessageBody = memo(({ message, onReply }: Props) => {
           </span>
         )}
       </div>
+
+      {/* Image Viewer Dialog */}
+      {showImageViewer && message?.image && (
+        <ImageViewerDialog 
+          imageUrl={message.image} 
+          onClose={() => setShowImageViewer(false)} 
+        />
+      )}
     </div>
   );
 });

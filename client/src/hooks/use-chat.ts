@@ -33,10 +33,12 @@ interface ChatState {
   createChat: (payload: CreateChatType) => Promise<ChatType | null>;
   fetchSingleChat: (chatId: string) => void;
   sendMessage: (payload: CreateMessageType) => void;
+  deleteChat: (chatId: string) => Promise<boolean>;
 
   addNewChat: (newChat: ChatType) => void;
   updateChatLastMessage: (chatId: string, lastMessage: MessageType) => void;
   addNewMessage: (chatId: string, message: MessageType) => void;
+  updateChatUnread: (chatId: string, unreadCount: number) => void;
 }
 
 export const useChat = create<ChatState>()((set, get) => ({
@@ -201,12 +203,47 @@ export const useChat = create<ChatState>()((set, get) => ({
   addNewMessage: (chatId, message) => {
     const chat = get().singleChat;
     if (chat?.chat._id === chatId) {
-      set({
-        singleChat: {
-          chat: chat.chat,
-          messages: [...chat.messages, message],
-        },
-      });
+      // Check if message already exists to prevent duplicates
+      const messageExists = chat.messages.some((msg) => msg._id === message._id);
+      if (!messageExists) {
+        set({
+          singleChat: {
+            chat: chat.chat,
+            messages: [...chat.messages, message],
+          },
+        });
+      }
+    }
+  },
+
+  updateChatUnread: (chatId: string, unreadCount: number) => {
+    set((state) => {
+      return {
+        chats: state.chats.map((c) =>
+          c._id === chatId
+            ? { ...c, unreadCount }
+            : c
+        ),
+      };
+    });
+  },
+
+  deleteChat: async (chatId: string) => {
+    try {
+      const chatToDelete = get().chats.find((c) => c._id === chatId);
+      const isGroup = chatToDelete?.isGroup;
+      
+      await API.delete(`/chat/${chatId}`);
+      set((state) => ({
+        chats: state.chats.filter((c) => c._id !== chatId),
+        singleChat: state.singleChat?.chat._id === chatId ? null : state.singleChat,
+      }));
+      
+      toast.success(isGroup ? "Group deleted successfully" : "Chat deleted successfully");
+      return true;
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to delete");
+      return false;
     }
   },
 }));

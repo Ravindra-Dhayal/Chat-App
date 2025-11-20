@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useChat } from "@/hooks/use-chat";
 import useChatId from "@/hooks/use-chat-id";
 import { useSocket } from "@/hooks/use-socket";
+import { API } from "@/lib/axios-client";
 import type { MessageType } from "@/types/chat.type";
 import { useEffect, useState } from "react";
 
@@ -26,6 +27,21 @@ const SingleChat = () => {
     if (!chatId) return;
     fetchSingleChat(chatId);
   }, [fetchSingleChat, chatId]);
+
+  // Mark chat as read when opened
+  useEffect(() => {
+    if (!chatId) return;
+    
+    const markAsRead = async () => {
+      try {
+        await API.post(`/chat/${chatId}/mark-as-read`);
+      } catch (error) {
+        console.error("Failed to mark chat as read:", error);
+      }
+    };
+
+    markAsRead();
+  }, [chatId]);
 
   //Socket Chat room
   useEffect(() => {
@@ -54,10 +70,10 @@ const SingleChat = () => {
   }
 
   return (
-    <div className="relative h-svh flex flex-col">
+    <div className="relative h-screen flex flex-col">
       <ChatHeader chat={chat} currentUserId={currentUserId} />
 
-      <div className="flex-1 overflow-y-auto bg-background">
+      <div className="flex-1 overflow-y-auto bg-background pb-24">
         {messages.length === 0 ? (
           <EmptyState
             title="Start a conversation"

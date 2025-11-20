@@ -123,4 +123,41 @@ hody {
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Custom Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.552 0.016 285.938 / 0.3);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.552 0.016 285.938 / 0.5);
+  }
+  
+  .dark ::-webkit-scrollbar-thumb {
+    background: oklch(0.705 0.015 286.067 / 0.3);
+  }
+  
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.705 0.015 286.067 / 0.5);
+  }
+  
+  /* Firefox Scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.552 0.016 285.938 / 0.3) transparent;
+  }
+  
+  .dark * {
+    scrollbar-color: oklch(0.705 0.015 286.067 / 0.3) transparent;
+  }
 }
