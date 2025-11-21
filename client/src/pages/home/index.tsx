@@ -32,7 +32,10 @@ const Home = () => {
   return (
     <div className="h-screen overflow-y-auto pb-20 bg-background">
       <div className="p-4">
-        <SectionHeader title="Home" className="mb-6" />
+        <SectionHeader
+          title="Home"
+          className="mb-6"
+        />
 
         {totalItems === 0 ? (
           <EmptyState />

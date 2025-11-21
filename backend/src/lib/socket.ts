@@ -21,24 +21,39 @@ export const initializeSocket = (httpServer: HTTPServer) => {
     },
   });
 
-  io.use(async (socket: AuthenticatedSocket, next) => {
+  io.use((socket: AuthenticatedSocket, next) => {
     try {
       const rawCookie = socket.handshake.headers.cookie;
 
-      if (!rawCookie) return next(new Error("Unauthorized"));
+      if (!rawCookie) {
+        return next(new Error("Unauthorized"));
+      }
 
-      const token = rawCookie?.split("=")?.[1]?.trim();
-      if (!token) return next(new Error("Unauthorized"));
+      // Parse cookies from the raw header, e.g. "accessToken=...; other=value"
+      const cookies = Object.fromEntries(
+        rawCookie.split(";").map((pair) => {
+          const [name, ...rest] = pair.split("=");
+          return [name.trim(), rest.join("=").trim()];
+        })
+      );
+
+      const token = cookies["accessToken"];
+      if (!token) {
+        return next(new Error("Unauthorized"));
+      }
 
       const decodedToken = jwt.verify(token, Env.JWT_SECRET) as {
         userId: string;
       };
-      if (!decodedToken) return next(new Error("Unauthorized"));
+
+      if (!decodedToken?.userId) {
+        return next(new Error("Unauthorized"));
+      }
 
       socket.userId = decodedToken.userId;
-      next();
+      return next();
     } catch (error) {
-      next(new Error("Internal server error"));
+      return next(new Error("Internal server error"));
     }
   });
 

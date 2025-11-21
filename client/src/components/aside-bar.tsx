@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "./theme-provider";
 import { isUserOnline } from "@/lib/helper";
 import { Button } from "./ui/button";
-import { Moon, Sun, Users, Phone, BookmarkIcon, Settings, UserPlus, HelpCircle, Edit } from "lucide-react";
+import { Moon, Sun, Users, Phone, BookmarkIcon, Settings, UserPlus, Edit, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,14 +40,14 @@ const AsideBar = ({ onClose }: Props) => {
 
   return (
     <>
-      {/* overlay sits below the aside but above page content; clicking it closes the aside */}
+      {/* mobile overlay sits below the aside but above page content; clicking it closes the aside */}
       {onClose && (
         <div
           role="button"
           tabIndex={0}
           onClick={onClose}
           onKeyDown={(e) => (e.key === "Escape" ? onClose() : null)}
-          className="fixed inset-0 bg-black/30 z-[9999]"
+          className="fixed inset-0 bg-black/30 z-[9999] lg:hidden"
           aria-hidden="false"
         />
       )}
@@ -58,6 +58,16 @@ const AsideBar = ({ onClose }: Props) => {
         <div className="w-full h-full px-4 pt-6 pb-6 flex flex-col">
           {/* User Profile Section */}
           <div className="mb-6 pb-6 flex flex-col items-start border-b border-sidebar-border">
+            {onClose && (
+              <button
+                type="button"
+                aria-label="Close sidebar"
+                onClick={onClose}
+                className="ml-auto mb-2 p-1 rounded-md hover:bg-sidebar-accent/20 focus:outline-none focus:ring-2 focus:ring-sidebar-accent"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div role="button" className="flex items-center gap-3 w-full cursor-pointer group">

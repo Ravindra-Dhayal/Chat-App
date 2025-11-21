@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import AsideMenuButton from "./aside-menu-button";
+import NotificationBell from "@/components/notification-bell";
 
 interface SectionHeaderProps {
   title: string;
@@ -16,7 +17,10 @@ const SectionHeader = ({ title, actions, className, titleClassName }: SectionHea
         <AsideMenuButton />
         <h1 className={cn("text-2xl font-bold", titleClassName)}>{title}</h1>
       </div>
-      {actions}
+      <div className="flex items-center gap-2">
+        {actions}
+        <NotificationBell />
+      </div>
     </div>
   );
 };

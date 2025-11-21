@@ -5,15 +5,24 @@ import { useChannel } from "@/hooks/use-channel";
 import { useChat } from "@/hooks/use-chat";
 import { useAuth } from "@/hooks/use-auth";
 import { useSettings } from "@/hooks/use-settings";
+import type { ChatType } from "@/types/chat.type";
+import type { ChannelType } from "@/hooks/use-channel";
 
 interface Props {
   children: React.ReactNode;
 }
+
 const AppWrapper = ({ children }: Props) => {
   const { socket, connectSocket } = useSocket();
-  const { updateChannelSubscriber, updateChannelAdmin, updateChannelUnread, channels } = useChannel();
+  const {
+    updateChannelSubscriber,
+    updateChannelAdmin,
+    updateChannelUnread,
+    channels,
+  } = useChannel();
   const { updateChatUnread, chats } = useChat();
   const { user } = useAuth();
+  const currentUserId = user?._id ?? null;
 
   // Initialize socket connection
   useEffect(() => {
@@ -42,40 +51,69 @@ const AppWrapper = ({ children }: Props) => {
       updateChannelAdmin(data.channelId, data.userId, "removed");
     };
 
-    // Listen for new messages in any chat/channel
-    const handleNewMessage = (data: { chatId: string }) => {
-      // Check if this is a channel
-      const channel = channels.find((c) => c._id === data.chatId);
-      if (channel) {
-        // For channels, add 1 to unread (since the current user isn't in the chat view during broadcast)
-        updateChannelUnread(data.chatId, (channel.unreadCount || 0) + 1);
+    // Listen for per-user notification events: message:new { chatId }
+    const handleNewMessage = (data: { chatId?: string }) => {
+      // Guard: only handle the lightweight notification payloads that include chatId
+      if (!data || !data.chatId) {
+        return;
       }
 
-      // Check if this is a chat/group
-      const chat = chats.find((c) => c._id === data.chatId);
+      const { chatId } = data;
+
+      // Debug log to help verify in the browser that events are received
+      // eslint-disable-next-line no-console
+      console.log("[notifications] message:new for chatId=", chatId);
+
+      // Determine which conversation this is
+      const channel: ChannelType | undefined = channels.find(
+        (c: ChannelType) => c._id === chatId
+      );
+      const chat: ChatType | undefined = chats.find(
+        (c: ChatType) => c._id === chatId
+      );
+
+      // Update unread counts
+      if (channel) {
+        updateChannelUnread(chatId, (channel.unreadCount || 0) + 1);
+      }
+
       if (chat) {
-        // For chats/groups, add 1 to unread
-        updateChatUnread(data.chatId, (chat.unreadCount || 0) + 1);
+        updateChatUnread(chatId, (chat.unreadCount || 0) + 1);
       }
 
       // Push a notification for this activity if notifications are enabled
       const settingsState = useSettings.getState();
-      if (settingsState.notificationsEnabled) {
-        const chatInfo = chat as unknown as { name?: string; groupName?: string } | null;
-        const channelInfo = channel as unknown as { groupName?: string } | null;
-
-        const displayName =
-          chatInfo?.name ||
-          chatInfo?.groupName ||
-          channelInfo?.groupName ||
-          "this conversation";
-
-        settingsState.addNotification({
-          title: "New message",
-          message: `New activity in ${displayName}`,
-          type: "message",
-        });
+      if (!settingsState.notificationsEnabled) {
+        return;
       }
+
+      let title = "New message";
+      let displayName = "this conversation";
+
+      if (channel) {
+        const channelName = channel.groupName || channel.name || "Channel";
+        displayName = channelName;
+        title = "New channel message";
+      } else if (chat) {
+        if (chat.isGroup) {
+          const groupName = chat.groupName || chat.name || "Group";
+          displayName = groupName;
+          title = "New group message";
+        } else {
+          const otherParticipant = chat.participants?.find(
+            (p) => p?._id && p._id !== currentUserId
+          );
+          const dmName = otherParticipant?.name || chat.name || "Chat";
+          displayName = dmName;
+          title = "New chat message";
+        }
+      }
+
+      settingsState.addNotification({
+        title,
+        message: `New activity in ${displayName}`,
+        type: "message",
+      });
     };
 
     socket.on("subscriber:joined", handleSubscriberJoined);
@@ -91,7 +129,16 @@ const AppWrapper = ({ children }: Props) => {
       socket.off("admin:removed", handleAdminRemoved);
       socket.off("message:new", handleNewMessage);
     };
-  }, [socket, updateChannelSubscriber, updateChannelAdmin, updateChannelUnread, updateChatUnread, channels, chats]);
+  }, [
+    socket,
+    updateChannelSubscriber,
+    updateChannelAdmin,
+    updateChannelUnread,
+    updateChatUnread,
+    channels,
+    chats,
+    currentUserId,
+  ]);
 
   return (
     <div className="h-full">

@@ -30,7 +30,7 @@ const Settings = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar Navigation */}
-          <div className="lg:col-span-1 space-y-2 h-fit sticky top-4">
+          <div className="lg:col-span-1 space-y-2 h-fit lg:sticky lg:top-4">
             {[
               { id: "general", label: "General", icon: Palette },
               { id: "notifications", label: "Notifications", icon: Bell },
