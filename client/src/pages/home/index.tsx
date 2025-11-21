@@ -1,13 +1,15 @@
 import { useMemo, useEffect } from "react";
 import { useChat } from "@/hooks/use-chat";
+import { useChannel } from "@/hooks/use-channel";
 import { useNavigate } from "react-router-dom";
 import EmptyState from "@/components/empty-state";
 import { useTheme } from "@/components/theme-provider";
 import SectionHeader from "@/components/section-header";
-import { MessageCircle, Users } from "lucide-react";
+import { MessageCircle, Users, Hash } from "lucide-react";
 
 const Home = () => {
   const { chats, fetchChats } = useChat();
+  const { channels, fetchUserChannels } = useChannel();
   const { theme } = useTheme();
   const navigate = useNavigate();
 
@@ -95,7 +97,7 @@ const Home = () => {
                   Channels
                 </h2>
                 <div className="space-y-2">
-                  {combinedItems.channels.map((channel) => (
+                  {combinedItems.channels.map((channel: any) => (
                     <button
                       key={channel._id}
                       onClick={() => navigate(`/channel/${channel._id}`)}
