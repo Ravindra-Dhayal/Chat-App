@@ -1,5 +1,6 @@
-import { memo, useState } from "react";
+import { memo, useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useSettings } from "@/hooks/use-settings";
 import { cn } from "@/lib/utils";
 import type { MessageType } from "@/types/chat.type";
 import AvatarWithBadge from "../avatar-with-badge";
@@ -14,7 +15,17 @@ interface Props {
 }
 const ChatMessageBody = memo(({ message, onReply }: Props) => {
   const { user } = useAuth();
+  const { autoDownloadPhotos } = useSettings();
   const [showImageViewer, setShowImageViewer] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  useEffect(() => {
+    if (autoDownloadPhotos) {
+      setIsImageLoaded(true);
+    } else {
+      setIsImageLoaded(false);
+    }
+  }, [autoDownloadPhotos]);
 
   const userId = user?._id || null;
   const isCurrentUser = message.sender?._id === userId;
@@ -92,12 +103,29 @@ const ChatMessageBody = memo(({ message, onReply }: Props) => {
             )}
 
             {message?.image && (
-              <img
-                src={message?.image || ""}
-                alt=""
-                className="rounded-lg max-w-xs cursor-pointer hover:opacity-90 transition-opacity"
-                onClick={() => setShowImageViewer(true)}
-              />
+              <div className="mt-1">
+                {!autoDownloadPhotos && !isImageLoaded ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="text-xs flex items-center gap-2"
+                    onClick={() => setIsImageLoaded(true)}
+                  >
+                    <span role="img" aria-hidden="true">
+                      📷
+                    </span>
+                    <span>Load photo</span>
+                  </Button>
+                ) : (
+                  <img
+                    src={message.image}
+                    alt=""
+                    className="rounded-lg max-w-xs cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={() => setShowImageViewer(true)}
+                  />
+                )}
+              </div>
             )}
 
             {message.content && <p>{message.content}</p>}

@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "./theme-provider";
 import { isUserOnline } from "@/lib/helper";
 import { Button } from "./ui/button";
-import { Moon, Sun, Users, Phone, BookmarkIcon, Settings, UserPlus, Edit, X } from "lucide-react";
+import { Moon, Sun, Users, Phone, BookmarkIcon, Settings, UserPlus, HelpCircle, Edit, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +35,8 @@ const AsideBar = ({ onClose }: Props) => {
     { icon: BookmarkIcon, label: "Saved Messages", action: () => navigate("/saved") },
     { icon: Settings, label: "Settings", action: () => navigate("/settings") },
     { icon: UserPlus, label: "Invite Friends", action: () => navigate("/invite") },
-    // { icon: HelpCircle, label: "Telegram Features", action: () => {} },
+    { icon: HelpCircle, label: "Website Features", action: () => navigate("/features") },
+    { icon: HelpCircle, label: "Terms & Privacy", action: () => navigate("/legal") },
   ];
 
   return (

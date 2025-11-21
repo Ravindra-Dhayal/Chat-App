@@ -4,6 +4,7 @@ import { LANGUAGES } from "@/constants";
 import ThemeSelector from "@/components/theme-selector";
 import NotificationsPanel from "@/components/notifications-panel";
 import { Download, Bell, Languages, Palette } from "lucide-react";
+import { useI18n } from "@/hooks/use-i18n";
 
 const Settings = () => {
   const {
@@ -17,6 +18,8 @@ const Settings = () => {
     setAutoDownloadDocuments,
   } = useSettings();
 
+  const { t } = useI18n();
+
   const [activeTab, setActiveTab] = useState("general");
 
   return (
@@ -24,18 +27,45 @@ const Settings = () => {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-base-content">Settings</h1>
-          <p className="text-base-content/70">Customize your chat app experience</p>
+          <h1 className="text-4xl font-bold mb-2 text-base-content">
+            {t("settings.title", "Settings")}
+          </h1>
+          <p className="text-base-content/70">
+            {t(
+              "settings.subtitle",
+              "Customize your chat app experience"
+            )}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1 space-y-2 h-fit lg:sticky lg:top-4">
             {[
-              { id: "general", label: "General", icon: Palette },
-              { id: "notifications", label: "Notifications", icon: Bell },
-              { id: "downloads", label: "Auto Downloads", icon: Download },
-              { id: "language", label: "Language", icon: Languages },
+              {
+                id: "general",
+                labelKey: "settings.tab.general",
+                defaultLabel: "General",
+                icon: Palette,
+              },
+              {
+                id: "notifications",
+                labelKey: "settings.tab.notifications",
+                defaultLabel: "Notifications",
+                icon: Bell,
+              },
+              {
+                id: "downloads",
+                labelKey: "settings.tab.downloads",
+                defaultLabel: "Auto Downloads",
+                icon: Download,
+              },
+              {
+                id: "language",
+                labelKey: "settings.tab.language",
+                defaultLabel: "Language",
+                icon: Languages,
+              },
             ].map((tab) => {
               const Icon = tab.icon;
               return (
@@ -49,7 +79,9 @@ const Settings = () => {
                   }`}
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="font-medium">{tab.label}</span>
+                  <span className="font-medium">
+                    {t(tab.labelKey, tab.defaultLabel)}
+                  </span>
                 </button>
               );
             })}
@@ -61,7 +93,9 @@ const Settings = () => {
               {/* General Tab - Theme */}
               {activeTab === "general" && (
                 <div>
-                  <h2 className="text-2xl font-bold mb-6 text-base-content">Appearance</h2>
+                  <h2 className="text-2xl font-bold mb-6 text-base-content">
+                    {t("settings.appearance.title", "Appearance")}
+                  </h2>
                   <ThemeSelector />
                 </div>
               )}
@@ -69,7 +103,12 @@ const Settings = () => {
               {/* Notifications Tab */}
               {activeTab === "notifications" && (
                 <div>
-                  <h2 className="text-2xl font-bold mb-6 text-base-content">Notification Settings</h2>
+                  <h2 className="text-2xl font-bold mb-6 text-base-content">
+                    {t(
+                      "settings.notifications.title",
+                      "Notification Settings"
+                    )}
+                  </h2>
                   <NotificationsPanel />
                 </div>
               )}
@@ -78,15 +117,30 @@ const Settings = () => {
               {activeTab === "downloads" && (
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-2xl font-bold mb-6 text-base-content">Auto Download Settings</h2>
+                    <h2 className="text-2xl font-bold mb-6 text-base-content">
+                      {t(
+                        "settings.autoDownloads.title",
+                        "Auto Download Settings"
+                      )}
+                    </h2>
                   </div>
 
                   <div className="space-y-4">
                     {/* Photos Download */}
                     <div className="flex items-center justify-between p-4 rounded-lg border border-base-300 bg-base-100 hover:bg-base-200 transition-colors">
                       <div>
-                        <h3 className="font-semibold">Auto-download Photos</h3>
-                        <p className="text-sm text-base-content/70">Automatically download incoming photos</p>
+                        <h3 className="font-semibold">
+                          {t(
+                            "settings.autoDownloads.photos.title",
+                            "Auto-download Photos"
+                          )}
+                        </h3>
+                        <p className="text-sm text-base-content/70">
+                          {t(
+                            "settings.autoDownloads.photos.description",
+                            "Automatically download incoming photos"
+                          )}
+                        </p>
                       </div>
                       <label className="cursor-pointer">
                         <input
@@ -101,8 +155,18 @@ const Settings = () => {
                     {/* Videos Download */}
                     <div className="flex items-center justify-between p-4 rounded-lg border border-base-300 bg-base-100 hover:bg-base-200 transition-colors">
                       <div>
-                        <h3 className="font-semibold">Auto-download Videos</h3>
-                        <p className="text-sm text-base-content/70">Automatically download incoming videos</p>
+                        <h3 className="font-semibold">
+                          {t(
+                            "settings.autoDownloads.videos.title",
+                            "Auto-download Videos"
+                          )}
+                        </h3>
+                        <p className="text-sm text-base-content/70">
+                          {t(
+                            "settings.autoDownloads.videos.description",
+                            "Automatically download incoming videos"
+                          )}
+                        </p>
                       </div>
                       <label className="cursor-pointer">
                         <input
@@ -117,8 +181,18 @@ const Settings = () => {
                     {/* Documents Download */}
                     <div className="flex items-center justify-between p-4 rounded-lg border border-base-300 bg-base-100 hover:bg-base-200 transition-colors">
                       <div>
-                        <h3 className="font-semibold">Auto-download Documents</h3>
-                        <p className="text-sm text-base-content/70">Automatically download incoming documents</p>
+                        <h3 className="font-semibold">
+                          {t(
+                            "settings.autoDownloads.documents.title",
+                            "Auto-download Documents"
+                          )}
+                        </h3>
+                        <p className="text-sm text-base-content/70">
+                          {t(
+                            "settings.autoDownloads.documents.description",
+                            "Automatically download incoming documents"
+                          )}
+                        </p>
                       </div>
                       <label className="cursor-pointer">
                         <input
@@ -132,7 +206,10 @@ const Settings = () => {
 
                     <div className="p-4 rounded-lg bg-primary/10">
                       <p className="text-sm text-primary">
-                        💡 Tip: Like Telegram, auto-download settings will help save your mobile data while keeping your favorite files accessible.
+                        {t(
+                          "settings.autoDownloads.tip",
+                          "Tip: Auto-download settings will help save your mobile data while keeping your favorite files accessible."
+                        )}
                       </p>
                     </div>
                   </div>
@@ -143,7 +220,12 @@ const Settings = () => {
               {activeTab === "language" && (
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-2xl font-bold mb-6 text-base-content">Language Preferences</h2>
+                    <h2 className="text-2xl font-bold mb-6 text-base-content">
+                      {t(
+                        "settings.language.title",
+                        "Language Preferences"
+                      )}
+                    </h2>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
@@ -164,7 +246,10 @@ const Settings = () => {
 
                   <div className="p-4 rounded-lg bg-success/10">
                     <p className="text-sm text-success">
-                      ✓ Current Language: <strong>{language}</strong>
+                      ✓ {t(
+                        "settings.language.currentLabel",
+                        "Current Language"
+                      )}: <strong>{language}</strong>
                     </p>
                   </div>
                 </div>

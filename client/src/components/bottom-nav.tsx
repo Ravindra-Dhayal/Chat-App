@@ -1,17 +1,19 @@
 import { NavLink } from "react-router-dom";
 import { Home, MessageCircle, Users, Hash, Globe } from "lucide-react";
 import { useTheme } from "./theme-provider";
+import { useI18n } from "@/hooks/use-i18n";
 
 const items = [
-  { label: "Home", to: "/home", icon: Home },
-  { label: "Chat", to: "/chat", icon: MessageCircle },
-  { label: "Groups", to: "/groups", icon: Users },
-  { label: "Channel", to: "/channel", icon: Hash },
-  { label: "Community", to: "/community", icon: Globe },
+  { key: "nav.home", fallback: "Home", to: "/home", icon: Home },
+  { key: "nav.chat", fallback: "Chat", to: "/chat", icon: MessageCircle },
+  { key: "nav.groups", fallback: "Groups", to: "/groups", icon: Users },
+  { key: "nav.channel", fallback: "Channel", to: "/channel", icon: Hash },
+  { key: "nav.community", fallback: "Community", to: "/community", icon: Globe },
 ];
 
 const BottomNav = () => {
   const { theme } = useTheme();
+  const { t } = useI18n();
 
   return (
     <nav
@@ -33,7 +35,9 @@ const BottomNav = () => {
                 }
               >
                 <Icon className="h-5 w-5" />
-                <span className="text-[10px] leading-none">{it.label}</span>
+                <span className="text-[10px] leading-none">
+                  {t(it.key, it.fallback)}
+                </span>
               </NavLink>
             </li>
           );

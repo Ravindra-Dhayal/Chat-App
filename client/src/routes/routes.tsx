@@ -11,6 +11,9 @@ import Groups from "@/pages/groups";
 import SingleGroup from "@/pages/groups/groupId";
 import Profile from "@/pages/profile";
 import Settings from "@/pages/settings";
+import InvitePage from "@/pages/invite";
+import FeaturesPage from "@/pages/features";
+import LegalPage from "@/pages/legal";
 
 export const AUTH_ROUTES = {
   SIGN_IN: "/",
@@ -29,6 +32,9 @@ export const PROTECTED_ROUTES = {
   SINGLE_GROUP: "/groups/:groupId",
   PROFILE: "/profile",
   SETTINGS: "/settings",
+  INVITE: "/invite",
+  FEATURES: "/features",
+  LEGAL: "/legal",
 };
 
 export const authRoutesPaths = [
@@ -82,6 +88,18 @@ export const protectedRoutesPaths = [
   {
     path: PROTECTED_ROUTES.PROFILE,
     element: <Profile />,
+  },
+  {
+    path: PROTECTED_ROUTES.INVITE,
+    element: <InvitePage />,
+  },
+  {
+    path: PROTECTED_ROUTES.FEATURES,
+    element: <FeaturesPage />,
+  },
+  {
+    path: PROTECTED_ROUTES.LEGAL,
+    element: <LegalPage />,
   },
   {
     path: PROTECTED_ROUTES.SETTINGS,

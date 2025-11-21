@@ -5,12 +5,14 @@ import type { ChannelType } from "@/hooks/use-channel";
 import { useNavigate } from "react-router-dom";
 import EmptyState from "@/components/empty-state";
 import SectionHeader from "@/components/section-header";
+import { useI18n } from "@/hooks/use-i18n";
 import { MessageCircle, Users, Hash } from "lucide-react";
 
 const Home = () => {
   const { chats, fetchChats } = useChat();
   const { channels, fetchUserChannels } = useChannel();
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   // Fetch data on mount
   useEffect(() => {
@@ -33,7 +35,7 @@ const Home = () => {
     <div className="h-screen overflow-y-auto pb-20 bg-background">
       <div className="p-4">
         <SectionHeader
-          title="Home"
+          title={t("home.title", "Home")}
           className="mb-6"
         />
 
@@ -46,7 +48,7 @@ const Home = () => {
               <section>
                 <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <MessageCircle className="h-5 w-5" />
-                  Chats
+                  {t("home.section.chats", "Chats")}
                 </h2>
                 <div className="space-y-2">
                   {combinedItems.chats.map((chat) => {
@@ -85,7 +87,8 @@ const Home = () => {
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium truncate">{chatName}</h3>
                           <p className="text-sm truncate text-muted-foreground">
-                            {chat.lastMessage?.content || "No messages yet"}
+                            {chat.lastMessage?.content ||
+                              t("home.chats.noMessages", "No messages yet")}
                           </p>
                         </div>
                         {chat.unreadCount !== undefined && chat.unreadCount > 0 && (
@@ -105,7 +108,7 @@ const Home = () => {
               <section>
                 <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <Hash className="h-5 w-5" />
-                  Channels
+                  {t("home.section.channels", "Channels")}
                 </h2>
                 <div className="space-y-2">
                   {combinedItems.channels.map((channel: ChannelType) => (
@@ -128,12 +131,15 @@ const Home = () => {
                         </h3>
                         <p className="text-sm truncate text-muted-foreground">
                           {channel.lastMessage?.content ||
-                            `${channel.subscriberCount || 0} subscribers`}
+                            `${channel.subscriberCount || 0} ${t(
+                              "home.channels.subscribersSuffix",
+                              "subscribers"
+                            )}`}
                         </p>
                       </div>
                       {channel.isPublic && (
                         <span className="text-xs font-medium px-2 py-1 rounded bg-base-200 text-base-content/80">
-                          Public
+                          {t("home.badge.public", "Public")}
                         </span>
                       )}
                     </button>
