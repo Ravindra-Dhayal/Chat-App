@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "dark" | "light" | "system";
+type Theme = string;
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -34,19 +34,28 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
 
+    // Clear previous mode classes
     root.classList.remove("light", "dark");
 
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
+    // Decide which theme name should be active for DaisyUI
+    let effectiveTheme: Theme = theme;
 
-      root.classList.add(systemTheme);
-      return;
+    if (theme === "system") {
+      const prefersDark = window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .matches;
+      effectiveTheme = prefersDark ? "dark" : "light";
     }
 
-    root.classList.add(theme);
+    // DaisyUI reads data-theme for named themes like "cyberpunk", "coffee", etc.
+    root.setAttribute("data-theme", effectiveTheme);
+
+    // Tailwind dark mode still relies on the "dark" class
+    if (effectiveTheme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.add("light");
+    }
   }, [theme]);
 
   const value = {

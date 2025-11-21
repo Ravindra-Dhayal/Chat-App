@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "daisyui";
 @import "tw-animate-css";
 
 html,
@@ -114,6 +115,72 @@ hody {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.541 0.281 293.009);
+}
+
+/* Additional named themes driven by `data-theme` on <html> */
+
+:root[data-theme="cupcake"] {
+  --background: #f5f5f4;
+  --foreground: #291334;
+  --primary: #65c3c8;
+  --secondary: #ef9fbc;
+  --accent: #ef9fbc;
+}
+
+:root[data-theme="forest"] {
+  --background: #1f1d1d;
+  --foreground: #e2e8f0;
+  --primary: #3ebc96;
+  --secondary: #70c217;
+  --accent: #70c217;
+}
+
+:root[data-theme="bumblebee"] {
+  --background: #ffffff;
+  --foreground: #1c1917;
+  --primary: #f8e36f;
+  --secondary: #f0d50c;
+  --accent: #f0d50c;
+}
+
+:root[data-theme="emerald"] {
+  --background: #ffffff;
+  --foreground: #1e3a8a;
+  --primary: #66cc8a;
+  --secondary: #3b82f6;
+  --accent: #3b82f6;
+}
+
+:root[data-theme="synthwave"] {
+  --background: #2d1b69;
+  --foreground: #f8f8f2;
+  --primary: #e779c1;
+  --secondary: #58c7f3;
+  --accent: #58c7f3;
+}
+
+:root[data-theme="cyberpunk"] {
+  --background: #1a103d;
+  --foreground: #ffee00;
+  --primary: #ff7598;
+  --secondary: #75d1f0;
+  --accent: #ff7598;
+}
+
+:root[data-theme="night"] {
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+  --primary: #38bdf8;
+  --secondary: #818cf8;
+  --accent: #38bdf8;
+}
+
+:root[data-theme="dracula"] {
+  --background: #282a36;
+  --foreground: #f8f8f2;
+  --primary: #ff79c6;
+  --secondary: #bd93f9;
+  --accent: #bd93f9;
 }
 
 @layer base {

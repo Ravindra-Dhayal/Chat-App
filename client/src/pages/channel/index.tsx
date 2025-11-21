@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useChannel } from "@/hooks/use-channel";
-import { useTheme } from "@/components/theme-provider";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChannelCreateDialog } from "@/components/channel/channel-create-dialog";
 import EmptyState from "@/components/empty-state";
@@ -10,8 +9,16 @@ import { Search, Plus } from "lucide-react";
 import ChannelInviteDialog from "@/components/channel/channel-invite-dialog";
 
 const Channel = () => {
-  const { channels, publicChannels, fetchUserChannels, fetchPublicChannels, isChannelsLoading, subscribeToChannel, createChannel, isCreatingChannel } = useChannel();
-  const { theme } = useTheme();
+  const {
+    channels,
+    publicChannels,
+    fetchUserChannels,
+    fetchPublicChannels,
+    isChannelsLoading,
+    subscribeToChannel,
+    createChannel,
+    isCreatingChannel,
+  } = useChannel();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
@@ -45,18 +52,23 @@ const Channel = () => {
 
   const displayChannels = showPublic ? publicChannels?.channels || [] : channels || [];
   const filteredChannels = displayChannels.filter((channel) =>
-    (channel.groupName || channel.name || "").toLowerCase().includes(searchQuery.toLowerCase())
+    (channel.groupName || channel.name || "")
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className={`h-screen overflow-y-auto pb-20 ${theme === "dark" ? "bg-slate-900" : "bg-white"}`}>
+    <div className="h-screen overflow-y-auto pb-20 bg-background">
       <div className="p-4">
         {/* Header */}
         <SectionHeader
           title="Channels"
           className="mb-6"
           actions={
-            <ChannelCreateDialog onCreateChannel={createChannel} isLoading={isCreatingChannel}>
+            <ChannelCreateDialog
+              onCreateChannel={createChannel}
+              isLoading={isCreatingChannel}
+            >
               <button
                 className="bg-primary text-primary-foreground p-2 rounded-lg hover:opacity-90 transition-opacity"
                 title="Create Channel"
@@ -85,9 +97,7 @@ const Channel = () => {
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               !showPublic
                 ? "bg-primary text-primary-foreground"
-                : theme === "dark"
-                  ? "bg-slate-800 text-slate-400"
-                  : "bg-gray-200 text-gray-600"
+                : "bg-base-200 text-base-content/70"
             }`}
           >
             My Channels
@@ -97,9 +107,7 @@ const Channel = () => {
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               showPublic
                 ? "bg-primary text-primary-foreground"
-                : theme === "dark"
-                  ? "bg-slate-800 text-slate-400"
-                  : "bg-gray-200 text-gray-600"
+                : "bg-base-200 text-base-content/70"
             }`}
           >
             Discover
@@ -118,28 +126,40 @@ const Channel = () => {
             {filteredChannels.map((channel) => (
               <div
                 key={channel._id}
-                className={`flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer
-                  ${theme === "dark" ? "hover:bg-slate-800" : "hover:bg-gray-100"}`}
+                className="flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer hover:bg-base-200"
                 onClick={() => !showPublic && navigate(`/channel/${channel._id}`)}
               >
                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 relative">
                   <span className="text-lg font-bold text-primary">#</span>
                   {channel.unreadCount && channel.unreadCount > 0 && (
-                    <span className={`absolute -top-1 -right-1 text-xs font-bold rounded-full h-5 min-w-[20px] flex items-center justify-center px-1 ${
-                      theme === "dark" ? "bg-green-500 text-white" : "bg-green-600 text-white"
-                    }`}>
+                    <span className="absolute -top-1 -right-1 text-xs font-bold rounded-full h-5 min-w-[20px] flex items-center justify-center px-1 bg-primary text-primary-foreground">
                       {channel.unreadCount > 100 ? "99+" : channel.unreadCount}
                     </span>
                   )}
                 </div>
-                <div className="flex-1 min-w-0" onClick={() => showPublic && navigate(`/channel/${channel._id}`)}>
-                  <h3 className="font-medium truncate">{channel.groupName || channel.name || "Channel"}</h3>
+                <div
+                  className="flex-1 min-w-0"
+                  onClick={() => showPublic && navigate(`/channel/${channel._id}`)}
+                >
+                  <h3 className="font-medium truncate">
+                    {channel.groupName || channel.name || "Channel"}
+                  </h3>
                   {(channel.lastMessage?.image || channel.lastMessage?.content) && (
-                    <p className={`text-sm truncate flex items-center gap-1 ${theme === "dark" ? "text-slate-400" : "text-gray-500"}`}>
+                    <p className="text-sm truncate flex items-center gap-1 text-muted-foreground">
                       {channel.lastMessage?.image ? (
                         <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
                           </svg>
                           <span>Image</span>
                         </>
@@ -168,7 +188,10 @@ const Channel = () => {
 
       {/* Invite Dialog */}
       {inviteChannelId && (
-        <ChannelInviteDialog channelId={inviteChannelId} onClose={handleCloseInvite} />
+        <ChannelInviteDialog
+          channelId={inviteChannelId}
+          onClose={handleCloseInvite}
+        />
       )}
     </div>
   );

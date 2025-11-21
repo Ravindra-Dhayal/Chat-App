@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ForbiddenException, UnauthorizedException } from "../utils/app-error";
+import { ForbiddenException, UnauthorizedException } from "../services/utils/app-error";
 import { UserRole } from "../models/user.model";
 
 interface RequestWithUser extends Request {

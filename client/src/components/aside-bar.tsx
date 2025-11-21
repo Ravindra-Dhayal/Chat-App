@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "./theme-provider";
 import { isUserOnline } from "@/lib/helper";
 import { Button } from "./ui/button";
-import { Moon, Sun, Users, Phone, BookmarkIcon, Settings, UserPlus, HelpCircle } from "lucide-react";
+import { Moon, Sun, Users, Phone, BookmarkIcon, Settings, UserPlus, HelpCircle, Edit } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,8 @@ import {
 } from "./ui/dropdown-menu";
 import AvatarWithBadge from "./avatar-with-badge";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import ProfileEditDialog from "./profile-edit-dialog";
 
 interface Props {
   onClose?: () => void;
@@ -21,6 +23,7 @@ const AsideBar = ({ onClose }: Props) => {
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
+  const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
 
   const isOnline = isUserOnline(user?._id);
 
@@ -32,7 +35,7 @@ const AsideBar = ({ onClose }: Props) => {
     { icon: BookmarkIcon, label: "Saved Messages", action: () => navigate("/saved") },
     { icon: Settings, label: "Settings", action: () => navigate("/settings") },
     { icon: UserPlus, label: "Invite Friends", action: () => navigate("/invite") },
-    { icon: HelpCircle, label: "Telegram Features", action: () => {} },
+    // { icon: HelpCircle, label: "Telegram Features", action: () => {} },
   ];
 
   return (
@@ -50,15 +53,11 @@ const AsideBar = ({ onClose }: Props) => {
       )}
 
       <aside
-        className={`top-0 fixed inset-y-0 left-0 z-[10000000] h-svh shadow-sm w-80 overflow-y-auto ${
-          theme === "dark" ? "bg-slate-800" : "bg-slate-100"
-        }`}
+        className="top-0 fixed inset-y-0 left-0 z-[10000000] h-svh shadow-sm w-80 overflow-y-auto bg-sidebar text-sidebar-foreground"
       >
         <div className="w-full h-full px-4 pt-6 pb-6 flex flex-col">
           {/* User Profile Section */}
-          <div className={`mb-6 pb-6 flex flex-col items-start ${
-            theme === "dark" ? "border-b border-slate-700" : "border-b border-slate-300"
-          }`}>
+          <div className="mb-6 pb-6 flex flex-col items-start border-b border-sidebar-border">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div role="button" className="flex items-center gap-3 w-full cursor-pointer group">
@@ -69,18 +68,30 @@ const AsideBar = ({ onClose }: Props) => {
                     className="!bg-blue-400"
                   />
                   <div className="flex-1 min-w-0">
-                    <h3 className={`text-lg font-semibold truncate ${
-                      theme === "dark" ? "text-white" : "text-slate-900"
-                    }`}>{user?.name || "Unknown"}</h3>
-                    <p className={`text-sm truncate ${
-                      theme === "dark" ? "text-slate-400" : "text-slate-600"
-                    }`}>{user?.email || "+91 XXXX XXXXX"}</p>
+                    <h3 className="text-lg font-semibold truncate text-sidebar-foreground">
+                      {user?.name || "Unknown"}
+                    </h3>
+                    <p className="text-sm truncate text-sidebar-foreground/70">
+                      {user?.email || "+91 XXXX XXXXX"}
+                    </p>
                   </div>
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-48 rounded-lg z-[99999]" align="start">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setIsProfileEditOpen(true);
+                    onClose?.();
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={logout} className="cursor-pointer">
+                  Logout
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -96,15 +107,9 @@ const AsideBar = ({ onClose }: Props) => {
                     item.action();
                     onClose?.();
                   }}
-                  className={`w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors text-left ${
-                    theme === "dark"
-                      ? "text-slate-200 hover:bg-slate-700"
-                      : "text-slate-700 hover:bg-slate-200"
-                  }`}
+                  className="w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors text-left text-sidebar-foreground hover:bg-sidebar-accent/10"
                 >
-                  <Icon className={`h-6 w-6 flex-shrink-0 ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-500"
-                  }`} />
+                  <Icon className="h-6 w-6 flex-shrink-0 text-sidebar-accent-foreground" />
                   <span className="font-medium text-base">{item.label}</span>
                 </button>
               );
@@ -112,20 +117,12 @@ const AsideBar = ({ onClose }: Props) => {
           </div>
 
           {/* Theme Toggle */}
-          <div className={`mt-auto pt-4 flex items-center justify-between ${
-            theme === "dark" ? "border-t border-slate-700" : "border-t border-slate-300"
-          }`}>
-            <span className={`text-sm ${
-              theme === "dark" ? "text-slate-400" : "text-slate-600"
-            }`}>Theme</span>
+          <div className="mt-auto pt-4 flex items-center justify-between border-t border-sidebar-border">
+            <span className="text-sm text-sidebar-foreground/70">Theme</span>
             <Button
               variant="outline"
               size="icon"
-              className={`rounded-full ${
-                theme === "dark"
-                  ? "border-slate-600 bg-slate-700 hover:bg-slate-600"
-                  : "border-slate-300 bg-slate-200 hover:bg-slate-300"
-              }`}
+              className="rounded-full border-sidebar-border bg-sidebar-accent/20 hover:bg-sidebar-accent/30"
               onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             >
               <Sun
@@ -138,6 +135,10 @@ const AsideBar = ({ onClose }: Props) => {
           </div>
         </div>
       </aside>
+      <ProfileEditDialog
+        isOpen={isProfileEditOpen}
+        onClose={() => setIsProfileEditOpen(false)}
+      />
     </>
   );
 };

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { loginSchema, registerSchema } from "../validators/auth.validator";
 import { loginService, registerService } from "../services/auth.service";
-import { clearJwtAuthCookie, setJwtAuthCookie } from "../utils/cookie";
+import { clearJwtAuthCookie, setJwtAuthCookie } from "../services/utils/cookie";
 import { HTTPSTATUS } from "../config/http.config";
 
 export const registerController = asyncHandler(

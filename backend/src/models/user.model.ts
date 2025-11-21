@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { compareValue, hashValue } from "../utils/bcrypt";
+import { compareValue, hashValue } from "../services/utils/bcrypt";
 
 export enum UserRole {
   USER = "USER",
@@ -10,6 +10,7 @@ export enum UserRole {
 export interface UserDocument extends Document {
   name: string;
   email?: string;
+  phone?: string;
   password?: string;
   avatar?: string | null;
   role: UserRole;
@@ -31,6 +32,10 @@ const userSchema = new Schema<UserDocument>(
       unique: true,
       trim: true,
       lowercase: true,
+    },
+    phone: {
+      type: String,
+      default: null,
     },
     password: {
       type: String,

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import cloudinary from "../config/cloudinary.config";
 import ChatModel, { ChatType } from "../models/chat.model";
 import MessageModel from "../models/message.model";
-import { BadRequestException, ForbiddenException, NotFoundException } from "../utils/app-error";
+import { BadRequestException, ForbiddenException, NotFoundException } from "../services/utils/app-error";
 import {
   emitLastMessageToParticipants,
   emitNewMessageToChatRoom,

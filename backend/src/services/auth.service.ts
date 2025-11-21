@@ -1,5 +1,5 @@
 import UserModel from "../models/user.model";
-import { NotFoundException, UnauthorizedException } from "../utils/app-error";
+import { NotFoundException, UnauthorizedException } from "../services/utils/app-error";
 import {
   LoginSchemaType,
   RegisterSchemaType,

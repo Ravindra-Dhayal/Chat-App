@@ -5,13 +5,14 @@ import { API } from "@/lib/axios-client";
 import { toast } from "sonner";
 import { Users, Check, AlertCircle, X } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import { useTheme } from "@/components/theme-provider";
+
+type ParticipantRef = { _id: string } | string;
 
 interface GroupInviteInfo {
   _id: string;
   groupName: string;
-  participants: any[];
-  admins: any[];
+  participants: ParticipantRef[];
+  admins: ParticipantRef[];
   isPublic?: boolean;
 }
 
@@ -23,7 +24,6 @@ interface GroupInviteDialogProps {
 const GroupInviteDialog = ({ groupId, onClose }: GroupInviteDialogProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { theme } = useTheme();
   const [groupInfo, setGroupInfo] = useState<GroupInviteInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isJoining, setIsJoining] = useState(false);
@@ -33,6 +33,7 @@ const GroupInviteDialog = ({ groupId, onClose }: GroupInviteDialogProps) => {
   useEffect(() => {
     if (!groupId) return;
     fetchGroupInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId]);
 
   const fetchGroupInfo = async () => {
@@ -40,15 +41,18 @@ const GroupInviteDialog = ({ groupId, onClose }: GroupInviteDialogProps) => {
     setError(null);
     try {
       const { data } = await API.get(`/chat/${groupId}`);
-      setGroupInfo(data.chat);
-      
+      const chat = data.chat as GroupInviteInfo;
+      setGroupInfo(chat);
+
       // Check if user is already a member
-      const isMember = data.chat.participants?.some(
-        (p: any) => p._id === user?._id || p === user?._id
-      );
+      const isMember = chat.participants?.some((p: ParticipantRef) => {
+        const participantId = typeof p === "string" ? p : p._id;
+        return participantId === user?._id;
+      });
       setAlreadyMember(isMember);
-    } catch (error: any) {
-      setError(error?.response?.data?.message || "Failed to load group information");
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      setError(err.response?.data?.message || "Failed to load group information");
     } finally {
       setIsLoading(false);
     }
@@ -63,8 +67,9 @@ const GroupInviteDialog = ({ groupId, onClose }: GroupInviteDialogProps) => {
       toast.success("Successfully joined the group!");
       navigate(`/chat/${groupId}`);
       onClose();
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to join group");
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || "Failed to join group");
     } finally {
       setIsJoining(false);
     }
@@ -82,15 +87,11 @@ const GroupInviteDialog = ({ groupId, onClose }: GroupInviteDialogProps) => {
 
       {/* Dialog */}
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-        <div
-          className={`rounded-xl shadow-lg w-full max-w-md
-            ${theme === "dark" ? "bg-slate-800" : "bg-white"}
-            flex flex-col`}
-        >
+        <div className="relative rounded-xl shadow-lg w-full max-w-md bg-base-100 flex flex-col">
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 hover:bg-muted rounded-lg transition-colors"
+            className="absolute top-4 right-4 p-2 hover:bg-base-200 rounded-lg transition-colors"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
@@ -117,7 +118,7 @@ const GroupInviteDialog = ({ groupId, onClose }: GroupInviteDialogProps) => {
           ) : (
             <>
               {/* Header */}
-              <div className="p-6 text-center border-b">
+              <div className="p-6 text-center border-b border-base-300">
                 <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                   <Users className="h-12 w-12 text-primary" />
                 </div>
@@ -137,7 +138,7 @@ const GroupInviteDialog = ({ groupId, onClose }: GroupInviteDialogProps) => {
                     </div>
                     <button
                       onClick={handleOpenGroup}
-                      className="w-full py-3 px-4 rounded-lg font-medium bg-primary text-white hover:opacity-90 transition-all"
+                      className="w-full py-3 px-4 rounded-lg font-medium bg-primary text-primary-foreground hover:opacity-90 transition-all"
                     >
                       Open Group
                     </button>
@@ -150,7 +151,7 @@ const GroupInviteDialog = ({ groupId, onClose }: GroupInviteDialogProps) => {
                     <button
                       onClick={handleJoinGroup}
                       disabled={isJoining}
-                      className="w-full py-3 px-4 rounded-lg font-medium bg-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      className="w-full py-3 px-4 rounded-lg font-medium bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                       {isJoining ? "Joining..." : "Join Group"}
                     </button>
@@ -159,14 +160,10 @@ const GroupInviteDialog = ({ groupId, onClose }: GroupInviteDialogProps) => {
               </div>
 
               {/* Footer */}
-              <div className="p-4 border-t">
+              <div className="p-4 border-t border-base-300">
                 <button
                   onClick={onClose}
-                  className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
-                    theme === "dark"
-                      ? "bg-slate-700 hover:bg-slate-600 text-white"
-                      : "bg-gray-200 hover:bg-gray-300 text-black"
-                  }`}
+                  className="w-full py-2 px-4 rounded-lg font-medium transition-colors bg-base-200 hover:bg-base-300 text-base-content"
                 >
                   Cancel
                 </button>

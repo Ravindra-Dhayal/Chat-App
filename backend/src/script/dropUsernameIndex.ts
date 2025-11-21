@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { getEnv } from "../utils/get-env";
+import { getEnv } from "../services/utils/get-env";
 
 async function dropUsernameIndex() {
   try {

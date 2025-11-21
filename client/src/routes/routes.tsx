@@ -9,6 +9,8 @@ import Community from "@/pages/community";
 import SingleCommunity from "@/pages/community/communityId";
 import Groups from "@/pages/groups";
 import SingleGroup from "@/pages/groups/groupId";
+import Profile from "@/pages/profile";
+import Settings from "@/pages/settings";
 
 export const AUTH_ROUTES = {
   SIGN_IN: "/",
@@ -25,6 +27,8 @@ export const PROTECTED_ROUTES = {
   SINGLE_COMMUNITY: "/community/:communityId",
   GROUPS: "/groups",
   SINGLE_GROUP: "/groups/:groupId",
+  PROFILE: "/profile",
+  SETTINGS: "/settings",
 };
 
 export const authRoutesPaths = [
@@ -74,6 +78,14 @@ export const protectedRoutesPaths = [
   {
     path: PROTECTED_ROUTES.SINGLE_GROUP,
     element: <SingleGroup />,
+  },
+  {
+    path: PROTECTED_ROUTES.PROFILE,
+    element: <Profile />,
+  },
+  {
+    path: PROTECTED_ROUTES.SETTINGS,
+    element: <Settings />,
   },
 ];
 

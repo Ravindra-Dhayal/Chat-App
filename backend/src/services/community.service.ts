@@ -5,7 +5,7 @@ import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
-} from "../utils/app-error";
+} from "../services/utils/app-error";
 
 export const createCommunityService = async (
   userId: string,

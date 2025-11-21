@@ -70,7 +70,7 @@ export const GroupCreateDialog = memo(({ children, onGroupCreated, isOpen: contr
         groupName: groupName,
       });
       
-      setIsOpen(false);
+      handleOpenChange(false);
       resetState();
       
       if (response?._id) {

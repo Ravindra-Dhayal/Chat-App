@@ -10,6 +10,7 @@ const router = Router();
 router.use("/auth", authRoutes);
 router.use("/chat", chatRoutes);
 router.use("/user", userRoutes);
+router.use("/users", userRoutes);
 router.use("/channel", channelRoutes);
 router.use("/community", communityRoutes);
 router.use("/admin", adminRoutes);

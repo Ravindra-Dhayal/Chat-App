@@ -5,7 +5,7 @@ import MessageModel from "../models/message.model";
 import {
   BadRequestException,
   NotFoundException,
-} from "../utils/app-error";
+} from "../services/utils/app-error";
 
 export const getDashboardStatsService = async () => {
   const userCount = await UserModel.countDocuments();

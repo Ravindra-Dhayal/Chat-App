@@ -4,6 +4,7 @@ import { useSocket } from "@/hooks/use-socket";
 import { useChannel } from "@/hooks/use-channel";
 import { useChat } from "@/hooks/use-chat";
 import { useAuth } from "@/hooks/use-auth";
+import { useSettings } from "@/hooks/use-settings";
 
 interface Props {
   children: React.ReactNode;
@@ -21,7 +22,7 @@ const AppWrapper = ({ children }: Props) => {
     }
   }, [user, connectSocket]);
 
-  // Channel socket event listeners
+  // Channel socket event listeners + notifications
   useEffect(() => {
     if (!socket) return;
 
@@ -55,6 +56,25 @@ const AppWrapper = ({ children }: Props) => {
       if (chat) {
         // For chats/groups, add 1 to unread
         updateChatUnread(data.chatId, (chat.unreadCount || 0) + 1);
+      }
+
+      // Push a notification for this activity if notifications are enabled
+      const settingsState = useSettings.getState();
+      if (settingsState.notificationsEnabled) {
+        const chatInfo = chat as unknown as { name?: string; groupName?: string } | null;
+        const channelInfo = channel as unknown as { groupName?: string } | null;
+
+        const displayName =
+          chatInfo?.name ||
+          chatInfo?.groupName ||
+          channelInfo?.groupName ||
+          "this conversation";
+
+        settingsState.addNotification({
+          title: "New message",
+          message: `New activity in ${displayName}`,
+          type: "message",
+        });
       }
     };
 

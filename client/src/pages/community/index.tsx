@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useCommunity } from "@/hooks/use-community";
-import { useTheme } from "@/components/theme-provider";
 import { useNavigate } from "react-router-dom";
 import { CommunityCreateDialog } from "@/components/community/community-create-dialog";
 import EmptyState from "@/components/empty-state";
@@ -9,8 +8,15 @@ import SectionHeader from "@/components/section-header";
 import { Search, Plus } from "lucide-react";
 
 const Community = () => {
-  const { communities, publicCommunities, fetchUserCommunities, fetchPublicCommunities, isCommunitiesLoading, createCommunity, isCreatingCommunity } = useCommunity();
-  const { theme } = useTheme();
+  const {
+    communities,
+    publicCommunities,
+    fetchUserCommunities,
+    fetchPublicCommunities,
+    isCommunitiesLoading,
+    createCommunity,
+    isCreatingCommunity,
+  } = useCommunity();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [showPublic, setShowPublic] = useState(false);
@@ -20,22 +26,26 @@ const Community = () => {
     if (showPublic) {
       fetchPublicCommunities();
     }
-  }, [showPublic]);
+  }, [showPublic, fetchUserCommunities, fetchPublicCommunities]);
 
-  const displayCommunities = showPublic ? publicCommunities?.communities || [] : communities || [];
+  const displayCommunities =
+    showPublic ? publicCommunities?.communities || [] : communities || [];
   const filteredCommunities = displayCommunities.filter((community) =>
     community.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className={`h-screen overflow-y-auto pb-20 ${theme === "dark" ? "bg-slate-900" : "bg-white"}`}>
+    <div className="h-screen overflow-y-auto pb-20 bg-background">
       <div className="p-4">
         {/* Header */}
         <SectionHeader
           title="Communities"
           className="mb-6"
           actions={
-            <CommunityCreateDialog onCreateCommunity={createCommunity} isLoading={isCreatingCommunity}>
+            <CommunityCreateDialog
+              onCreateCommunity={createCommunity}
+              isLoading={isCreatingCommunity}
+            >
               <button
                 className="bg-primary text-primary-foreground p-2 rounded-lg hover:opacity-90 transition-opacity"
                 title="Create Community"
@@ -64,9 +74,7 @@ const Community = () => {
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               !showPublic
                 ? "bg-primary text-primary-foreground"
-                : theme === "dark"
-                  ? "bg-slate-800 text-slate-400"
-                  : "bg-gray-200 text-gray-600"
+                : "bg-base-200 text-base-content/70"
             }`}
           >
             My Communities
@@ -76,9 +84,7 @@ const Community = () => {
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               showPublic
                 ? "bg-primary text-primary-foreground"
-                : theme === "dark"
-                  ? "bg-slate-800 text-slate-400"
-                  : "bg-gray-200 text-gray-600"
+                : "bg-base-200 text-base-content/70"
             }`}
           >
             Discover
@@ -98,16 +104,18 @@ const Community = () => {
               <button
                 key={community._id}
                 onClick={() => navigate(`/community/${community._id}`)}
-                className={`w-full text-left flex items-center gap-3 p-3 rounded-lg transition-colors
-                  ${theme === "dark" ? "hover:bg-slate-800" : "hover:bg-gray-100"}`}
+                className="w-full text-left flex items-center gap-3 p-3 rounded-lg transition-colors hover:bg-base-200"
               >
                 <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-lg font-bold text-purple-500">👥</span>
+                  <span className="text-lg font-bold text-purple-500">
+                    ?
+                  </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium truncate">{community.name}</h3>
-                  <p className={`text-sm truncate ${theme === "dark" ? "text-slate-400" : "text-gray-500"}`}>
-                    {community.description || `${community.members?.length || 0} members`}
+                  <p className="text-sm truncate text-muted-foreground">
+                    {community.description ||
+                      `${community.members?.length || 0} members`}
                   </p>
                 </div>
               </button>

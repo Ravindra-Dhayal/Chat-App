@@ -7,7 +7,6 @@ import ChatListHeader from "./chat-list-header";
 import { useSocket } from "@/hooks/use-socket";
 import type { ChatType } from "@/types/chat.type";
 import type { MessageType } from "@/types/chat.type";
-import { useTheme } from "@/components/theme-provider";
 
 const ChatList = () => {
   const navigate = useNavigate();
@@ -20,7 +19,6 @@ const ChatList = () => {
     updateChatLastMessage,
   } = useChat();
   const { user } = useAuth();
-  const { theme } = useTheme();
   const currentUserId = user?._id || null;
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -79,7 +77,7 @@ const ChatList = () => {
   };
 
   return (
-    <div className={`h-screen overflow-y-auto pb-20 ${theme === "dark" ? "bg-slate-900" : "bg-white"}`}>
+    <div className="h-screen overflow-y-auto pb-20 bg-background">
       <div className="p-4">
         <ChatListHeader onSearch={setSearchQuery} />
 

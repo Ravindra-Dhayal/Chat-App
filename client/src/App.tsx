@@ -18,11 +18,7 @@ function App() {
 
   if (isAuthStatusLoading && !user) {
     return (
-      <div
-        className="flex flex-col items-center
-       justify-center h-screen
-      "
-      >
+      <div className="flex flex-col items-center justify-center h-screen bg-background text-base-content">
         <Logo imgClass="size-20" showText={false} />
         <Spinner className="w-6 h-6" />
       </div>

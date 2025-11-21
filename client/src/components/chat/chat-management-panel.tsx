@@ -1,14 +1,5 @@
 import { memo, useState } from "react";
-import {
-  Info,
-  Image,
-  Link,
-  FileText,
-  Ban,
-  Flag,
-  Trash2,
-  X,
-} from "lucide-react";
+import { Image, Ban, Flag, Trash2, X } from "lucide-react";
 import { useTheme } from "../theme-provider";
 import { useAuth } from "@/hooks/use-auth";
 import { useChat } from "@/hooks/use-chat";

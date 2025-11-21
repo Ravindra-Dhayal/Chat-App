@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Response } from "express";
-import { Env } from "../config/env.config";
+import { Env } from "../../config/env.config";
 
 type Time = `${number}${"s" | "m" | "h" | "d" | "w" | "y"}`;
 type Cookie = {

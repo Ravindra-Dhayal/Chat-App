@@ -1,4 +1,4 @@
-import { HTTPSTATUS, HttpStatusCodeType } from "../config/http.config";
+import { HTTPSTATUS, HttpStatusCodeType } from "../../config/http.config";
 
 export const ErrorCodes = {
   ERR_INTERNAL: "ERR_INTERNAL",

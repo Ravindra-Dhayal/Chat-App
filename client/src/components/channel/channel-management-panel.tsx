@@ -31,9 +31,13 @@ export const ChannelManagementPanel = memo(
     const [showViewSubscribers, setShowViewSubscribers] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    type ChannelAdmin = string | { _id: string };
+
     const [subscribers, setSubscribers] = useState<UserType[]>([]);
     const [admins, setAdmins] = useState<string[]>(
-      (channel.admins || []).map((a: any) => (typeof a === 'string' ? a : a._id))
+      (channel.admins || []).map((admin: ChannelAdmin) =>
+        typeof admin === "string" ? admin : admin._id
+      )
     );
 
     // Fetch channel subscribers
@@ -47,15 +51,22 @@ export const ChannelManagementPanel = memo(
       try {
         const { data } = await API.get(`/channel/${channel._id}/info`);
         // Remove duplicates based on _id
-        const uniqueSubscribers = Array.from(
-          new Map((data.channel.participants || []).map((s: UserType) => [s._id, s])).values()
+        const uniqueSubscribers: UserType[] = Array.from(
+          new Map<string, UserType>(
+            (data.channel.participants || []).map((s: UserType) => [s._id, s])
+          ).values()
         );
         setSubscribers(uniqueSubscribers);
         setAdmins(
-          (data.channel.admins || []).map((a: any) => (typeof a === 'string' ? a : a._id))
+          (data.channel.admins || []).map((admin: ChannelAdmin) =>
+            typeof admin === "string" ? admin : admin._id
+          )
         );
-      } catch (error: any) {
-        toast.error(error?.response?.data?.message || "Failed to fetch subscribers");
+      } catch (error) {
+        const message =
+          (error as { response?: { data?: { message?: string } } }).response?.data
+            ?.message ?? "Failed to fetch subscribers";
+        toast.error(message);
       }
     };
 
@@ -64,8 +75,11 @@ export const ChannelManagementPanel = memo(
         await API.post(`/channel/${channel._id}/remove-subscriber`, { userId });
         setSubscribers(subscribers.filter((s) => s._id !== userId));
         toast.success("Subscriber removed");
-      } catch (error: any) {
-        toast.error(error?.response?.data?.message || "Failed to remove subscriber");
+      } catch (error) {
+        const message =
+          (error as { response?: { data?: { message?: string } } }).response?.data
+            ?.message ?? "Failed to remove subscriber";
+        toast.error(message);
       }
     };
 
@@ -74,8 +88,11 @@ export const ChannelManagementPanel = memo(
         await API.post(`/channel/${channel._id}/admin/${userId}/add`);
         setAdmins([...admins, userId]);
         toast.success("User promoted to admin");
-      } catch (error: any) {
-        toast.error(error?.response?.data?.message || "Failed to promote user");
+      } catch (error) {
+        const message =
+          (error as { response?: { data?: { message?: string } } }).response?.data
+            ?.message ?? "Failed to promote user";
+        toast.error(message);
       }
     };
 
@@ -84,8 +101,11 @@ export const ChannelManagementPanel = memo(
         await API.post(`/channel/${channel._id}/admin/${userId}/remove`);
         setAdmins(admins.filter((id) => id !== userId));
         toast.success("Admin rights removed");
-      } catch (error: any) {
-        toast.error(error?.response?.data?.message || "Failed to remove admin rights");
+      } catch (error) {
+        const message =
+          (error as { response?: { data?: { message?: string } } }).response?.data
+            ?.message ?? "Failed to remove admin rights";
+        toast.error(message);
       }
     };
 
@@ -97,8 +117,11 @@ export const ChannelManagementPanel = memo(
         setShowDeleteDialog(false);
         onClose();
         navigate("/channel");
-      } catch (error: any) {
-        toast.error(error?.response?.data?.message || "Failed to delete channel");
+      } catch (error) {
+        const message =
+          (error as { response?: { data?: { message?: string } } }).response?.data
+            ?.message ?? "Failed to delete channel";
+        toast.error(message);
       } finally {
         setIsDeleting(false);
       }
@@ -156,9 +179,12 @@ export const ChannelManagementPanel = memo(
             <p className="text-sm text-muted-foreground">
               Channel · {subscribers.length} subscribers
             </p>
-            {(channel as any).channelDescription && (
+            {(channel as ChannelType & { channelDescription?: string }).channelDescription && (
               <p className="text-sm text-center mt-3 px-4 text-muted-foreground">
-                {(channel as any).channelDescription}
+                {
+                  (channel as ChannelType & { channelDescription?: string })
+                    .channelDescription
+                }
               </p>
             )}
           </div>

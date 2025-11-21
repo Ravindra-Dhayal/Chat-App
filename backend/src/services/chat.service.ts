@@ -7,7 +7,7 @@ import {
   BadRequestException,
   NotFoundException,
   ForbiddenException,
-} from "../utils/app-error";
+} from "../services/utils/app-error";
 
 export const createChatService = async (
   userId: string,

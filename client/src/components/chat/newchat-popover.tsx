@@ -1,7 +1,6 @@
 import { memo, useEffect, useState } from "react";
 import { useChat } from "@/hooks/use-chat";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Button } from "../ui/button";
 import { Plus, Search } from "lucide-react";
 import { InputGroupInput } from "../ui/input-group";
 import { Spinner } from "../ui/spinner";
@@ -11,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 export const NewChatPopover = memo(() => {
   const navigate = useNavigate();
-  const { fetchAllUsers, users, isUsersLoading, createChat, isCreatingChat } = useChat();
+  const { fetchAllUsers, users, isUsersLoading, createChat } = useChat();
 
   const [isOpen, setIsOpen] = useState(false);
   const [loadingUserId, setLoadingUserId] = useState<string | null>(null);

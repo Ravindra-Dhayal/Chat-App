@@ -5,7 +5,7 @@ import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
-} from "../utils/app-error";
+} from "../services/utils/app-error";
 import { emitNewChatToParticpants } from "../lib/socket";
 
 export const createChannelService = async (
