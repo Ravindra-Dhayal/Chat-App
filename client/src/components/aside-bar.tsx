@@ -56,7 +56,9 @@ const AsideBar = ({ onClose }: Props) => {
       >
         <div className="w-full h-full px-4 pt-6 pb-6 flex flex-col">
           {/* User Profile Section */}
-          <div className="mb-8 flex flex-col items-start">
+          <div className={`mb-6 pb-6 flex flex-col items-start ${
+            theme === "dark" ? "border-b border-slate-700" : "border-b border-slate-300"
+          }`}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div role="button" className="flex items-center gap-3 w-full cursor-pointer group">
@@ -84,7 +86,7 @@ const AsideBar = ({ onClose }: Props) => {
           </div>
 
           {/* Menu Items */}
-          <div className="flex-1 space-y-2">
+          <div className="flex-1 space-y-1">
             {menuItems.map((item, index) => {
               const Icon = item.icon;
               return (
