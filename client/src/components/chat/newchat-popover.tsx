@@ -2,65 +2,34 @@ import { memo, useEffect, useState } from "react";
 import { useChat } from "@/hooks/use-chat";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
-import { ArrowLeft, Plus, Search, UsersIcon } from "lucide-react";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "../ui/input-group";
+import { Plus, Search } from "lucide-react";
+import { InputGroupInput } from "../ui/input-group";
 import { Spinner } from "../ui/spinner";
 import type { UserType } from "../../types/auth.type";
 import AvatarWithBadge from "../avatar-with-badge";
-import { Checkbox } from "../ui/checkbox";
 import { useNavigate } from "react-router-dom";
 
 export const NewChatPopover = memo(() => {
   const navigate = useNavigate();
-  const { fetchAllUsers, users, isUsersLoading, createChat, isCreatingChat } =
-    useChat();
+  const { fetchAllUsers, users, isUsersLoading, createChat, isCreatingChat } = useChat();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isGroupMode, setIsGroupMode] = useState(false);
-  const [groupName, setGroupName] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-
   const [loadingUserId, setLoadingUserId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    fetchAllUsers();
-  }, [fetchAllUsers]);
-
-  const toggleUserSelection = (id: string) => {
-    setSelectedUsers((prev) =>
-      prev.includes(id) ? prev.filter((userId) => userId !== id) : [...prev, id]
-    );
-  };
-
-  const handleBack = () => {
-    resetState();
-  };
+    if (isOpen) {
+      fetchAllUsers();
+    }
+  }, [isOpen, fetchAllUsers]);
 
   const resetState = () => {
-    setIsGroupMode(false);
-    setGroupName("");
-    setSelectedUsers([]);
+    setSearchQuery("");
   };
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     resetState();
-  };
-
-  const handleCreateGroup = async () => {
-    if (!groupName.trim() || selectedUsers?.length === 0) return;
-    const response = await createChat({
-      isGroup: true,
-      participants: selectedUsers,
-      groupName: groupName,
-    });
-    setIsOpen(false);
-    resetState();
-    navigate(`/chat/${response?._id}`);
   };
 
   const handleCreateChat = async (userId: string) => {
@@ -80,6 +49,10 @@ export const NewChatPopover = memo(() => {
     }
   };
 
+  const filteredUsers = users?.filter((user) =>
+    user.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
+
   return (
     <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
@@ -93,88 +66,42 @@ export const NewChatPopover = memo(() => {
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="w-80 z-[999] p-0
-         rounded-xl min-h-[400px]
-         max-h-[80vh] flex flex-col
-        "
+        className="w-80 z-[999] p-0 rounded-xl min-h-[400px] max-h-[80vh] flex flex-col"
       >
         <div className="border-b p-3 flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            {isGroupMode && (
-              <Button variant="ghost" size="icon" onClick={handleBack}>
-                <ArrowLeft size={16} />
-              </Button>
-            )}
-            <h3 className="text-lg font-semibold">
-              {isGroupMode ? "New Group" : "New Chat"}
-            </h3>
-          </div>
-
-          <InputGroup>
+          <h3 className="text-lg font-semibold">New Chat</h3>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <InputGroupInput
-              value={isGroupMode ? groupName : ""}
-              onChange={
-                isGroupMode ? (e) => setGroupName(e.target.value) : undefined
-              }
-              placeholder={isGroupMode ? "Enter group name" : "Search name"}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search users..."
+              className="pl-10"
             />
-            <InputGroupAddon>
-              {isGroupMode ? <UsersIcon /> : <Search />}
-            </InputGroupAddon>
-          </InputGroup>
+          </div>
         </div>
 
-        <div
-          className="flex-1 justify-center overflow-y-auto
-         px-1 py-1 space-y-1
-        "
-        >
+        <div className="flex-1 justify-center overflow-y-auto px-1 py-1 space-y-1">
           {isUsersLoading ? (
-            <Spinner className="w-6 h-6" />
-          ) : users && users?.length === 0 ? (
-            <div className="text-center text-muted-foreground">
+            <div className="flex items-center justify-center py-8">
+              <Spinner className="w-6 h-6" />
+            </div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">
               No users found
             </div>
-          ) : !isGroupMode ? (
-            <>
-              {users?.map((user) => (
-                <ChatUserItem
-                  key={user._id}
-                  user={user}
-                  isLoading={loadingUserId === user._id}
-                  disabled={loadingUserId !== null}
-                  onClick={handleCreateChat}
-                />
-              ))}
-            </>
           ) : (
-            users?.map((user) => (
-              <GroupUserItem
+            filteredUsers.map((user) => (
+              <ChatUserItem
                 key={user._id}
                 user={user}
-                isSelected={selectedUsers.includes(user._id)}
-                onToggle={toggleUserSelection}
+                isLoading={loadingUserId === user._id}
+                disabled={loadingUserId !== null}
+                onClick={handleCreateChat}
               />
             ))
           )}
         </div>
-
-        {isGroupMode && (
-          <div className="border-t p-3">
-            <Button
-              onClick={handleCreateGroup}
-              className="w-full"
-              disabled={
-                isCreatingChat ||
-                !groupName.trim() ||
-                selectedUsers.length === 0
-              }
-            >
-              {isCreatingChat && <Spinner className="w-4 h-4" />}
-              Create Group
-            </Button>
-          </div>
-        )}
       </PopoverContent>
     </Popover>
   );
@@ -186,32 +113,12 @@ const UserAvatar = memo(({ user }: { user: UserType }) => (
     <AvatarWithBadge name={user.name} src={user.avatar ?? ""} />
     <div className="flex-1 min-w-0">
       <h5 className="text-[13.5px] font-medium truncate">{user.name}</h5>
-      <p className="text-xs text-muted-foreground">Hey there! I'm using whop</p>
+      <p className="text-xs text-muted-foreground">Hey there! I'm using chat</p>
     </div>
   </>
 ));
 
 UserAvatar.displayName = "UserAvatar";
-
-const NewGroupItem = memo(
-  ({ disabled, onClick }: { disabled: boolean; onClick: () => void }) => (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className="w-full flex items-center
-       gap-2 p-2 rounded-sm hover:bg-accent
-       transition-colors text-left disabled:opacity-50
-      "
-    >
-      <div className="bg-primary/10 p-2 rounded-full">
-        <UsersIcon className="size-4 text-primary" />
-      </div>
-      <span>New Group</span>
-    </button>
-  )
-);
-
-NewGroupItem.displayName = "NewGroupItem";
 
 const ChatUserItem = memo(
   ({
@@ -226,10 +133,7 @@ const ChatUserItem = memo(
     onClick: (id: string) => void;
   }) => (
     <button
-      className="
-      relative w-full flex items-center gap-2 p-2
-    rounded-sm hover:bg-accent
-       transition-colors text-left disabled:opacity-50"
+      className="relative w-full flex items-center gap-2 p-2 rounded-sm hover:bg-accent transition-colors text-left disabled:opacity-50"
       disabled={isLoading || disabled}
       onClick={() => onClick(user._id)}
     >
@@ -240,31 +144,3 @@ const ChatUserItem = memo(
 );
 
 ChatUserItem.displayName = "ChatUserItem";
-
-const GroupUserItem = memo(
-  ({
-    user,
-    isSelected,
-    onToggle,
-  }: {
-    user: UserType;
-    isSelected: boolean;
-    onToggle: (id: string) => void;
-  }) => (
-    <label
-      role="button"
-      className="w-full flex items-center gap-2 p-2
-      rounded-sm hover:bg-accent
-       transition-colors text-left
-      "
-    >
-      <UserAvatar user={user} />
-      <Checkbox
-        checked={isSelected}
-        onCheckedChange={() => onToggle(user._id)}
-      />
-    </label>
-  )
-);
-
-GroupUserItem.displayName = "GroupUserItem";

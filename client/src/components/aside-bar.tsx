@@ -26,7 +26,7 @@ const AsideBar = ({ onClose }: Props) => {
 
   const menuItems = [
     { icon: Users, label: "My Profile", action: () => navigate("/profile") },
-    { icon: Users, label: "New Group", action: () => navigate("/chat?new=group") },
+    { icon: Users, label: "New Group", action: () => navigate("/groups?new=group") },
     { icon: Users, label: "Contacts", action: () => navigate("/contacts") },
     { icon: Phone, label: "Calls", action: () => navigate("/calls") },
     { icon: BookmarkIcon, label: "Saved Messages", action: () => navigate("/saved") },

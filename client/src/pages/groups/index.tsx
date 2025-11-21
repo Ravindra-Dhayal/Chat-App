@@ -16,10 +16,22 @@ const Groups = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [inviteGroupId, setInviteGroupId] = useState<string | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchChats();
   }, [fetchChats]);
+
+  // Handle create group parameter from URL
+  useEffect(() => {
+    const newGroup = searchParams.get("new");
+    if (newGroup === "group") {
+      setIsCreateDialogOpen(true);
+      // Remove new param from URL
+      searchParams.delete("new");
+      setSearchParams(searchParams);
+    }
+  }, [searchParams, setSearchParams]);
 
   // Handle invite parameter from URL
   useEffect(() => {
@@ -29,11 +41,16 @@ const Groups = () => {
     }
   }, [searchParams]);
 
-  const handleCloseInvite = () => {
-    setInviteGroupId(null);
-    // Remove invite param from URL
-    searchParams.delete("invite");
-    setSearchParams(searchParams);
+  const handleCloseCreateDialog = () => {
+    setIsCreateDialogOpen(false);
+  };
+
+  const handleGroupCreated = (groupId?: string) => {
+    fetchChats();
+    handleCloseCreateDialog();
+    if (groupId) {
+      navigate(`/groups/${groupId}`);
+    }
   };
 
   // Filter only group chats (exclude channels)
@@ -59,7 +76,11 @@ const Groups = () => {
           title="Groups"
           className="mb-6"
           actions={
-            <GroupCreateDialog onGroupCreated={fetchChats}>
+            <GroupCreateDialog 
+              onGroupCreated={handleGroupCreated}
+              isOpen={isCreateDialogOpen}
+              onOpenChange={setIsCreateDialogOpen}
+            >
               <button
                 className="bg-primary text-primary-foreground p-2 rounded-lg hover:opacity-90 transition-opacity"
                 title="Create Group"

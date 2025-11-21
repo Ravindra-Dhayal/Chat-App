@@ -17,13 +17,16 @@ import { useNavigate } from "react-router-dom";
 interface GroupCreateDialogProps {
   children: ReactNode;
   onGroupCreated?: (groupId?: string) => void;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export const GroupCreateDialog = memo(({ children, onGroupCreated }: GroupCreateDialogProps) => {
+export const GroupCreateDialog = memo(({ children, onGroupCreated, isOpen: controlledIsOpen, onOpenChange }: GroupCreateDialogProps) => {
   const navigate = useNavigate();
   const { fetchAllUsers, users, isUsersLoading, createChat, isCreatingChat } = useChat();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
   const [groupName, setGroupName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,7 +50,11 @@ export const GroupCreateDialog = memo(({ children, onGroupCreated }: GroupCreate
   };
 
   const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
+    if (controlledIsOpen !== undefined) {
+      onOpenChange?.(open);
+    } else {
+      setInternalIsOpen(open);
+    }
     if (!open) {
       resetState();
     }
