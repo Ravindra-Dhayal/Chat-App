@@ -283,15 +283,6 @@ const Settings = () => {
                           </button>
                         ))}
                       </div>
-
-                      <div className="p-4 rounded-lg bg-success/10">
-                        <p className="text-sm text-success">
-                          ✓ {t(
-                            "settings.language.currentLabel",
-                            "Current Language"
-                          )}: <strong>{language}</strong>
-                        </p>
-                      </div>
                     </div>
                   )}
                 </div>

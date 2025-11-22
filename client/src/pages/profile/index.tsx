@@ -3,11 +3,13 @@ import { useAuth } from "@/hooks/use-auth";
 import ProfileEditDialog from "@/components/profile-edit-dialog";
 import AvatarWithBadge from "@/components/avatar-with-badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Mail, Phone, Calendar, Shield } from "lucide-react";
+import { Edit, Mail, Phone, Calendar, Shield, X } from "lucide-react";
 import { isUserOnline } from "@/lib/helper";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const isOnline = user ? isUserOnline(user._id) : false;
@@ -24,11 +26,20 @@ const Profile = () => {
     <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 relative">
           <h1 className="text-4xl font-bold mb-2 text-base-content">My Profile</h1>
           <p className="text-muted-foreground">
             View and manage your profile information
           </p>
+          
+          {/* Close Button */}
+          <button
+            onClick={() => navigate("/")}
+            className="absolute top-0 right-0 p-2 rounded-lg hover:bg-accent transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Close profile"
+          >
+            <X className="h-6 w-6 text-base-content" />
+          </button>
         </div>
 
         {/* Main Card */}
