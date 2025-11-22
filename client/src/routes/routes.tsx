@@ -11,6 +11,8 @@ import Groups from "@/pages/groups";
 import SingleGroup from "@/pages/groups/groupId";
 import Profile from "@/pages/profile";
 import Settings from "@/pages/settings";
+import Contacts from "@/pages/contacts";
+import Saved from "@/pages/saved";
 import InvitePage from "@/pages/invite";
 import FeaturesPage from "@/pages/features";
 import LegalPage from "@/pages/legal";
@@ -32,6 +34,8 @@ export const PROTECTED_ROUTES = {
   SINGLE_GROUP: "/groups/:groupId",
   PROFILE: "/profile",
   SETTINGS: "/settings",
+  CONTACTS: "/contacts",
+  SAVED: "/saved",
   INVITE: "/invite",
   FEATURES: "/features",
   LEGAL: "/legal",
@@ -104,6 +108,14 @@ export const protectedRoutesPaths = [
   {
     path: PROTECTED_ROUTES.SETTINGS,
     element: <Settings />,
+  },
+  {
+    path: PROTECTED_ROUTES.CONTACTS,
+    element: <Contacts />,
+  },
+  {
+    path: PROTECTED_ROUTES.SAVED,
+    element: <Saved />,
   },
 ];
 

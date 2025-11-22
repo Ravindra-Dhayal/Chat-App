@@ -8,8 +8,9 @@ interface Props {
   chatId: string | null;
   messages: MessageType[];
   onReply: (message: MessageType) => void;
+  chatName?: string;
 }
-const ChatBody = ({ chatId, messages, onReply }: Props) => {
+const ChatBody = ({ chatId, messages, onReply, chatName }: Props) => {
   const { socket } = useSocket();
   const { addNewMessage } = useChat();
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -60,6 +61,8 @@ const ChatBody = ({ chatId, messages, onReply }: Props) => {
             key={message._id}
             message={message}
             onReply={onReply}
+            chatId={chatId || undefined}
+            chatName={chatName}
           />
         );
       })}

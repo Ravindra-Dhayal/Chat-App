@@ -227,4 +227,24 @@ hody {
   .dark * {
     scrollbar-color: oklch(0.705 0.015 286.067 / 0.3) transparent;
   }
+
+  /* Hide scrollbar utility for mobile horizontal scrolls */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Improve touch scrolling on mobile */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
 }

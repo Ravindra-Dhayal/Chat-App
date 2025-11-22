@@ -23,6 +23,11 @@ const SingleChat = () => {
   const chat = singleChat?.chat;
   const messages = singleChat?.messages || [];
 
+  // Get chat name for saved messages context
+  const chatName = chat?.isGroup 
+    ? chat.groupName || chat.name || "Group Chat"
+    : chat?.participants?.find(p => p._id !== currentUserId)?.name || "Chat";
+
   useEffect(() => {
     if (!chatId) return;
     fetchSingleChat(chatId);
@@ -80,7 +85,12 @@ const SingleChat = () => {
             description="No messages yet. Send the first message"
           />
         ) : (
-          <ChatBody chatId={chatId} messages={messages} onReply={setReplyTo} />
+          <ChatBody 
+            chatId={chatId} 
+            messages={messages} 
+            onReply={setReplyTo}
+            chatName={chatName}
+          />
         )}
       </div>
 

@@ -88,7 +88,7 @@ const Groups = () => {
               onOpenChange={setIsCreateDialogOpen}
             >
               <button
-                className="bg-primary text-primary-foreground p-2 rounded-lg hover:opacity-90 transition-opacity"
+                className="bg-primary text-primary-foreground p-3 rounded-lg hover:opacity-90 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center"
                 title="Create Group"
               >
                 <Plus className="h-5 w-5" />

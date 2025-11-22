@@ -16,9 +16,12 @@ const AsideMenuButton = ({ className }: AsideMenuButtonProps) => {
         type="button"
         aria-label="Toggle navigation menu"
         onClick={() => setIsOpen(true)}
-        className={cn("p-1 rounded-md hover:bg-muted", className)}
+        className={cn(
+          "p-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center border border-border bg-card hover:shadow-md",
+          className
+        )}
       >
-        <Menu className="h-5 w-5" />
+        <Menu className="h-6 w-6 text-foreground" />
       </button>
       {isOpen && <AsideBar onClose={() => setIsOpen(false)} />}
     </>

@@ -28,6 +28,9 @@ const SingleGroup = () => {
   // Check if current user is the creator (group admin)
   const isAdmin = chat?.createdBy === currentUserId;
 
+  // Get group name for saved messages context
+  const groupName = chat?.groupName || chat?.name || "Group";
+
   // Fetch group chat
   useEffect(() => {
     if (!groupId) return;
@@ -99,7 +102,12 @@ const SingleGroup = () => {
             description="No messages yet. Be the first to send a message!"
           />
         ) : (
-          <ChatBody chatId={groupId!} messages={messages} onReply={setReplyTo} />
+          <ChatBody 
+            chatId={groupId!} 
+            messages={messages} 
+            onReply={setReplyTo}
+            chatName={groupName}
+          />
         )}
       </div>
 

@@ -1,6 +1,7 @@
 import { useSettings } from "@/hooks/use-settings";
 import { Bell, Trash2, MessageSquare, AlertCircle, Info } from "lucide-react";
 import { Button } from "./ui/button";
+import { Switch } from "./ui/switch";
 
 const NotificationsPanel = () => {
   const { notifications, notificationsEnabled, setNotificationsEnabled, clearNotification, clearAllNotifications, markNotificationAsRead } = useSettings();
@@ -23,13 +24,11 @@ const NotificationsPanel = () => {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Notifications</h3>
         <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={notificationsEnabled}
-            onChange={(e) => setNotificationsEnabled(e.target.checked)}
-            className="checkbox checkbox-sm"
-          />
           <span className="text-sm">Enable Notifications</span>
+          <Switch
+            checked={notificationsEnabled}
+            onCheckedChange={setNotificationsEnabled}
+          />
         </label>
       </div>
 

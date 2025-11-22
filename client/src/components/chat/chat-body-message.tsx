@@ -1,21 +1,26 @@
 import { memo, useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useSettings } from "@/hooks/use-settings";
+import { useSavedMessages } from "@/hooks/use-saved-messages";
 import { cn } from "@/lib/utils";
 import type { MessageType } from "@/types/chat.type";
 import AvatarWithBadge from "../avatar-with-badge";
 import { formatChatTime } from "@/lib/helper";
 import { Button } from "../ui/button";
-import { ReplyIcon } from "lucide-react";
+import { ReplyIcon, BookmarkIcon } from "lucide-react";
 import ImageViewerDialog from "./image-viewer-dialog";
+import { toast } from "sonner";
 
 interface Props {
   message: MessageType;
   onReply: (message: MessageType) => void;
+  chatId?: string;
+  chatName?: string;
 }
-const ChatMessageBody = memo(({ message, onReply }: Props) => {
+const ChatMessageBody = memo(({ message, onReply, chatId, chatName }: Props) => {
   const { user } = useAuth();
   const { autoDownloadPhotos } = useSettings();
+  const { saveMessage, unsaveMessage, isMessageSaved } = useSavedMessages();
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
@@ -26,6 +31,18 @@ const ChatMessageBody = memo(({ message, onReply }: Props) => {
       setIsImageLoaded(false);
     }
   }, [autoDownloadPhotos]);
+
+  const isSaved = isMessageSaved(message._id);
+
+  const handleToggleSave = () => {
+    if (isSaved) {
+      unsaveMessage(message._id);
+      toast.success("Message removed from saved");
+    } else {
+      saveMessage(message, chatId, chatName);
+      toast.success("Message saved successfully");
+    }
+  };
 
   const userId = user?._id || null;
   const isCurrentUser = message.sender?._id === userId;
@@ -131,23 +148,39 @@ const ChatMessageBody = memo(({ message, onReply }: Props) => {
             {message.content && <p>{message.content}</p>}
           </div>
 
-          {/* {Reply Icon Button} */}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onReply(message)}
-            className="flex opacity-0 group-hover:opacity-100
-            transition-opacity rounded-full !size-8
-            "
-          >
-            <ReplyIcon
-              size={16}
-              className={cn(
-                "text-gray-500 dark:text-white !stroke-[1.9]",
-                isCurrentUser && "scale-x-[-1]"
-              )}
-            />
-          </Button>
+          {/* Action Buttons */}
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleToggleSave}
+              className="rounded-full !size-8"
+              title={isSaved ? "Remove from saved" : "Save message"}
+            >
+              <BookmarkIcon
+                size={16}
+                className={cn(
+                  "text-gray-500 dark:text-white !stroke-[1.9]",
+                  isSaved && "fill-current text-primary"
+                )}
+              />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => onReply(message)}
+              className="rounded-full !size-8"
+              title="Reply to message"
+            >
+              <ReplyIcon
+                size={16}
+                className={cn(
+                  "text-gray-500 dark:text-white !stroke-[1.9]",
+                  isCurrentUser && "scale-x-[-1]"
+                )}
+              />
+            </Button>
+          </div>
         </div>
 
         {message.status && (

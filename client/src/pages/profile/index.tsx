@@ -125,7 +125,7 @@ const Profile = () => {
           {/* Edit Button */}
           <div className="flex gap-3 pt-4 border-t border-border/60">
             <Button
-              className="flex-1 gap-2"
+              className="flex-1 gap-2 min-h-[44px]"
               onClick={() => setIsEditDialogOpen(true)}
             >
               <Edit className="w-4 h-4" />

@@ -98,6 +98,9 @@ const SingleChannel = () => {
     (typeof admin === 'string' ? admin : admin._id) === currentUserId
   );
 
+  // Get channel name for saved messages context
+  const channelName = currentChannel.name || currentChannel.groupName || "Channel";
+
   return (
     <div className="relative h-screen flex flex-col">
       <ChannelHeader 
@@ -117,6 +120,7 @@ const SingleChannel = () => {
             chatId={channelId!} 
             messages={messages} 
             onReply={() => {}} // Channels don't support replies
+            chatName={channelName}
           />
         )}
       </div>

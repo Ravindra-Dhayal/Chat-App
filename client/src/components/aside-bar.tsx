@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "./theme-provider";
 import { isUserOnline } from "@/lib/helper";
 import { Button } from "./ui/button";
-import { Moon, Sun, Users, Phone, BookmarkIcon, Settings, UserPlus, HelpCircle, Edit, X } from "lucide-react";
+import { Moon, Sun, Users, BookmarkIcon, Settings, UserPlus, HelpCircle, Edit, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +31,6 @@ const AsideBar = ({ onClose }: Props) => {
     { icon: Users, label: "My Profile", action: () => navigate("/profile") },
     { icon: Users, label: "New Group", action: () => navigate("/groups?new=group") },
     { icon: Users, label: "Contacts", action: () => navigate("/contacts") },
-    { icon: Phone, label: "Calls", action: () => navigate("/calls") },
     { icon: BookmarkIcon, label: "Saved Messages", action: () => navigate("/saved") },
     { icon: Settings, label: "Settings", action: () => navigate("/settings") },
     { icon: UserPlus, label: "Invite Friends", action: () => navigate("/invite") },
@@ -47,14 +46,15 @@ const AsideBar = ({ onClose }: Props) => {
           role="button"
           tabIndex={0}
           onClick={onClose}
-          onKeyDown={(e) => (e.key === "Escape" ? onClose() : null)}
-          className="fixed inset-0 bg-black/30 z-[9999] lg:hidden"
+          onKeyDown={(e) => (e.key === "Escape" || e.key === "Enter" ? onClose() : null)}
+          className="fixed inset-0 bg-black/50 z-[9998] backdrop-blur-sm"
+          aria-label="Close sidebar"
           aria-hidden="false"
         />
       )}
 
       <aside
-        className="top-0 fixed inset-y-0 left-0 z-[10000000] h-svh shadow-sm w-80 overflow-y-auto bg-sidebar text-sidebar-foreground"
+        className="top-0 fixed inset-y-0 left-0 z-[9999] h-svh shadow-lg w-full sm:w-80 max-w-sm overflow-y-auto bg-sidebar text-sidebar-foreground transition-transform duration-300 ease-in-out"
       >
         <div className="w-full h-full px-4 pt-6 pb-6 flex flex-col">
           {/* User Profile Section */}
@@ -71,7 +71,7 @@ const AsideBar = ({ onClose }: Props) => {
             )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div role="button" className="flex items-center gap-3 w-full cursor-pointer group">
+                <div role="button" className="flex items-center gap-3 w-full cursor-pointer group p-1 rounded-lg hover:bg-sidebar-accent/10 transition-colors min-h-[44px]">
                   <AvatarWithBadge
                     name={user?.name || "Unknown"}
                     src={user?.avatar || ""}
@@ -118,7 +118,7 @@ const AsideBar = ({ onClose }: Props) => {
                     item.action();
                     onClose?.();
                   }}
-                  className="w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-colors text-left text-sidebar-foreground hover:bg-sidebar-accent/10"
+                  className="w-full flex items-center gap-4 px-4 py-3.5 rounded-lg transition-colors text-left text-sidebar-foreground hover:bg-sidebar-accent/10 active:bg-sidebar-accent/20 min-h-[44px]"
                 >
                   <Icon className="h-6 w-6 flex-shrink-0 text-sidebar-accent-foreground" />
                   <span className="font-medium text-base">{item.label}</span>
@@ -129,11 +129,11 @@ const AsideBar = ({ onClose }: Props) => {
 
           {/* Theme Toggle */}
           <div className="mt-auto pt-4 flex items-center justify-between border-t border-sidebar-border">
-            <span className="text-sm text-sidebar-foreground/70">Theme</span>
+            <span className="text-sm font-medium text-sidebar-foreground/70">Theme</span>
             <Button
               variant="outline"
               size="icon"
-              className="rounded-full border-sidebar-border bg-sidebar-accent/20 hover:bg-sidebar-accent/30"
+              className="rounded-full border-sidebar-border bg-sidebar-accent/20 hover:bg-sidebar-accent/30 min-h-[44px] min-w-[44px]"
               onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             >
               <Sun
